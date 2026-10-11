@@ -393,7 +393,7 @@ function beginTurn() {
   S.phase = 'banner'; S.phaseT = 1.4; S.turnTime = TURN_TIME; S.turnKO = false; S.quietT = 0; S.focusT = 0; S.fired = false; S.charge = null; S.gun = null;
   S.ai = { st: 'think', t: 0.45 + S.rnd() * 0.4, moved: false, jumpCd: 0, flee: 0, fleeT: 0 };
   b.power = 0; I.stick = null; I.fireReq = null;
-  if (!S.tutorial) showBanner(b.human ? 'あなたの番' : `${b.name}の番`, b.color);
+  if (!S.tutorial) showBanner(b.human ? tr('あなたの番') : tr('{name}の番', { name: b.name }), b.color);
   sfx(b.human ? 'myturn' : 'turn');
   if (Math.random() < 0.6) speak(b, 'turn');
   if (b.human && !S.hintShown) { S.hintShown = true; showHint(true); }
@@ -646,7 +646,7 @@ function kill(b, by, how) {
   else boomFx(b.x, b.y, 0.55, b.color);
   if (by && by !== b) {
     by.kills++; by.score += KILL_PTS;
-    floater(b.x, b.y - 60, `撃破 +${KILL_PTS}`, '#FFC531', 1.8);
+    floater(b.x, b.y - 60, tr('撃破 +{n}', { n: KILL_PTS }), '#FFC531', 1.8);
     setMood(by, 'smug', 2.6); speak(by, 'ko', true);
   }
   // 余韻: 少しスローにして、やられた場所を映す
@@ -832,7 +832,7 @@ function gasStep(dt) {
   for (const g of S.gases) {
     g.life -= dt; g.r = Math.min(78, g.r + 140 * dt);
     for (const o of S.bots) if (o.alive && !g.hit.has(o) && hyp(o.x - g.x, o.y - g.y) < g.r) {
-      g.hit.add(o); o.poison = 3; o.poisonBy = g.owner !== o ? g.owner : null; floater(o.x, o.y - 54, '毒', '#C9A8FF');
+      g.hit.add(o); o.poison = 3; o.poisonBy = g.owner !== o ? g.owner : null; floater(o.x, o.y - 54, tr('毒'), '#C9A8FF');
     }
   }
   S.gases = S.gases.filter(g => g.life > 0);
@@ -857,13 +857,13 @@ function crateStep(dt) {
 }
 function pickCrate(b, c) {
   c.dead = true; sfx('pick'); b.crates++;
-  if (c.kind === 'heal') { const v = Math.min(30, b.maxHp - b.hp); b.hp += v; floater(b.x, b.y - 54, `修理 +${v}`, '#7BE38B'); }
+  if (c.kind === 'heal') { const v = Math.min(30, b.maxHp - b.hp); b.hp += v; floater(b.x, b.y - 54, tr('修理 +{n}', { n: v }), '#7BE38B'); }
   else if (c.kind === 'ammo') {
     const opts = WORDER.filter(k => WP[k].ammo !== Infinity && WP[k].lv <= (b.human ? P.lv : 99) && (b.ammo[k] > 0 || WP[k].lv <= (b.human ? P.lv : 5)));
     const k = opts[Math.floor(S.rnd() * opts.length)] || 'grenade';
     const n = 1 + Math.floor(S.rnd() * 2); b.ammo[k] = (b.ammo[k] || 0) + n;
     floater(b.x, b.y - 54, `${WP[k].name} +${n}`, '#FFE08A');
-  } else { b.rivetBonus = (b.rivetBonus || 0) + 50; floater(b.x, b.y - 54, 'リベット +50', '#FFC531'); }
+  } else { b.rivetBonus = (b.rivetBonus || 0) + 50; floater(b.x, b.y - 54, tr('リベット +50'), '#FFC531'); }
 }
 
 // ---------------------------------------------------------------- 操作
@@ -965,10 +965,10 @@ function playerControl(b, dt) {
 function useBoost() {
   const b = S.active;
   if (!b || !b.human || !b.alive || b.boost <= 0 || !(S.phase === 'turn' || S.phase === 'retreat')) return;
-  if (b.hp >= b.maxHp) { floater(b.x, b.y - 54, 'HP満タン', '#CFD8DC'); return; }
+  if (b.hp >= b.maxHp) { floater(b.x, b.y - 54, tr('HP満タン'), '#CFD8DC'); return; }
   if (b.boost <= Math.min(2, P.kits || 0)) { P.kits = Math.max(0, (P.kits || 0) - 1); saveProfile(); }
   b.boost--; const v = Math.min(35, b.maxHp - b.hp); b.hp += v;
-  floater(b.x, b.y - 54, `修理 +${v}`, '#7BE38B'); sfx('pick');
+  floater(b.x, b.y - 54, tr('修理 +{n}', { n: v }), '#7BE38B'); sfx('pick');
 }
 
 // ---------------------------------------------------------------- CPU
@@ -2521,7 +2521,7 @@ const STORY = [
     lose: [[3, 'idle', 'まだ映りが甘い。また来い。']],
   },
 ];
-const goalText = g => g.type === 'kills' ? `${g.n}体撃破` : g.n === 1 ? '1位' : `${g.n}位以内`;
+const goalText = g => g.type === 'kills' ? tr('{n}体撃破', { n: g.n }) : g.n === 1 ? tr('1位') : tr('{n}位以内', { n: g.n });
 function goalMet(g, me, place) { return g.type === 'kills' ? me.kills >= g.n : place <= g.n; }
 
 // 語り役ドック（島の修理屋）。試合には出ないので、会話と工場でだけ描く
@@ -2586,7 +2586,7 @@ function talkLine() {
   box.classList.toggle('right', !!b && who !== 0 && who !== 'doc');
   box.style.setProperty('--c', b ? b.color : '#A3B3BC');
   $('#talkName').textContent = b ? b.name : '';
-  TALK.text = text; TALK.shown = 0; TALK.full = false; TALK.t0 = performance.now();
+  TALK.text = tr(text); TALK.shown = 0; TALK.full = false; TALK.t0 = performance.now();
   $('#talkText').textContent = '';
   if (b) {
     b.mood = mood || 'idle'; b.moodT = 6;
@@ -2634,7 +2634,7 @@ function tutSetup() {
   S.bots.length = 2;
   const put = (b, x) => { b.x = x; let f = 300; while (f < WATER && !solid(x, f + 1)) f++; b.y = f - R; b.grounded = true; b.vx = b.vy = 0; };
   put(me, 230); me.facing = 1; syncAim(me);
-  dummy.name = 'かかし'; dummy.color = '#B9A27A'; dummy.light = shadeHex('#B9A27A', 0.45); dummy.dark = shadeHex('#B9A27A', -0.35);
+  dummy.name = tr('かかし'); dummy.color = '#B9A27A'; dummy.light = shadeHex('#B9A27A', 0.45); dummy.dark = shadeHex('#B9A27A', -0.35);
   dummy.eye = '#FFF0C8'; dummy.hat = 'none'; dummy.id = 5; dummy.dummy = true; dummy.maxHp = dummy.hp = 300;
   put(dummy, 1330); dummy.facing = -1; syncAim(dummy);
   S.npc = { x: 120, y: 0, facing: 1 }; let f = 300; while (f < WATER && !solid(120, f + 1)) f++; S.npc.y = f - R;
@@ -2648,7 +2648,7 @@ function showCoach() {
   const st = TUT_STEPS[S.tutorial.step];
   $('#coach').hidden = false;
   $('#coachStep').textContent = `${S.tutorial.step + 1} / ${TUT_STEPS.length}`;
-  $('#coachText').textContent = document.body.classList.contains('touch') ? st.sp : st.pc;
+  $('#coachText').textContent = tr(document.body.classList.contains('touch') ? st.sp : st.pc);
   $('#coach').classList.remove('ok');
   DOC.mood = 'ready';
   requestAnimationFrame(() => paintPortrait($('#coachFace'), { ...DOC, mood: 'ready', facing: 1 }, 1.35, 1.08));
@@ -2670,7 +2670,7 @@ function tutCheck() {
   else if (key === 'swap') ok = me.weapon === 'grenade';
   else if (key === 'drop') ok = d.deaths > 0;
   if (ok) {
-    T2.okT = 1.1; $('#coach').classList.add('ok'); $('#coachText').textContent = ['よし。', 'うまい。', 'その調子じゃ。', 'それでいい。', '見事じゃ。'][T2.step];
+    T2.okT = 1.1; $('#coach').classList.add('ok'); $('#coachText').textContent = tr(['よし。', 'うまい。', 'その調子じゃ。', 'それでいい。', '見事じゃ。'][T2.step]);
     sfx('pick'); requestAnimationFrame(() => paintPortrait($('#coachFace'), { ...DOC, mood: 'happy', facing: 1 }, 1.35, 1.08));
   }
   // かかしは壊れても、すぐ元の場所に戻す
@@ -2688,7 +2688,7 @@ function tutFinish() {
     const first = !P.tut;
     P.tut = true; if (first) { P.rivets += 200; saveProfile(); }
     goTitle(); openStory();
-    if (first) toast('チュートリアル完了　リベット +200');
+    if (first) toast(tr('チュートリアル完了　リベット +200'));
   });
 }
 
@@ -2698,7 +2698,7 @@ function openStory() {
   const box = $('#storyList'); box.innerHTML = '';
   const tb = document.createElement('button');
   tb.className = 'chap tut' + (P.tut ? ' cleared' : '');
-  tb.innerHTML = `<b>はじめに</b><span class="ct">ドックの修理工場</span><small>操作を覚える（チュートリアル）</small>${P.tut ? `<em>${svg('star')}クリア</em>` : '<em class="new">まずはここ</em>'}`;
+  tb.innerHTML = `<b>${tr('はじめに')}</b><span class="ct">${tr('ドックの修理工場')}</span><small>${tr('操作を覚える（チュートリアル）')}</small>${P.tut ? `<em>${svg('star')}${tr('クリア')}</em>` : `<em class="new">${tr('まずはここ')}</em>`}`;
   tb.addEventListener('click', startTutorial);
   box.appendChild(tb);
   STORY.forEach((ch, i) => {
@@ -2706,7 +2706,7 @@ function openStory() {
     const bt = document.createElement('button');
     bt.className = 'chap' + (locked ? ' locked' : '') + (cleared ? ' cleared' : '');
     bt.disabled = locked;
-    bt.innerHTML = `<b>第${i + 1}話</b><span class="ct"></span><small>${STAGES[ch.stage].name}　目標 ${goalText(ch.goal)}　CPU ${{ easy: 'やさしい', normal: 'ふつう', hard: 'つよい' }[ch.diff]}</small>${cleared ? `<em>${svg('star')}クリア</em>` : locked ? `<em>${svg('lock')}</em>` : (P.tut ? `<em class="new">次はここ</em>` : '<em></em>')}`;
+    bt.innerHTML = `<b>${tr('第{n}話', { n: i + 1 })}</b><span class="ct"></span><small>${tr('{s}　目標 {g}　CPU {d}', { s: STAGES[ch.stage].name, g: goalText(ch.goal), d: tr({ easy: 'やさしい', normal: 'ふつう', hard: 'つよい' }[ch.diff]) })}</small>${cleared ? `<em>${svg('star')}${tr('クリア')}</em>` : locked ? `<em>${svg('lock')}</em>` : (P.tut ? `<em class="new">${tr('次はここ')}</em>` : '<em></em>')}`;
     bt.querySelector('.ct').textContent = ch.title;
     bt.addEventListener('click', () => playChapter(i));
     box.appendChild(bt);
@@ -2755,7 +2755,7 @@ function saleLeft() {
 }
 const ammoPrice = k => Math.round(AMMO_PRICE[k] * (k === saleWeapon() ? 1 - SALE_OFF : 1));
 function canPay(c) { return P.rivets >= (c.rivets || 0) && P.gears >= (c.gears || 0); }
-function pay(c) { if (!canPay(c)) { toast('リベットかギアが足りません'); return false; } P.rivets -= c.rivets || 0; P.gears -= c.gears || 0; return true; }
+function pay(c) { if (!canPay(c)) { toast(tr('リベットかギアが足りません')); return false; } P.rivets -= c.rivets || 0; P.gears -= c.gears || 0; return true; }
 function addStock(k, n) { P.stock = P.stock || {}; P.stock[k] = (P.stock[k] || 0) + n; }
 
 function buyAmmo(k, inMatch) {
@@ -2766,7 +2766,7 @@ function buyAmmo(k, inMatch) {
 }
 function buyPack(pk) {
   const pool = WORDER.filter(k => AMMO_PRICE[k] && WP[k].lv >= pk.lv[0] && WP[k].lv <= pk.lv[1] && WP[k].lv <= P.lv);
-  if (!pool.length) { toast(`Lv${pk.lv[0]}で買えるようになります`); return; }
+  if (!pool.length) { toast(tr('Lv{n}で買えるようになります', { n: pk.lv[0] })); return; }
   if (!pay(pk)) return;
   const got = [];
   for (let i = 0; i < pk.n; i++) { const k = pool[Math.floor(Math.random() * pool.length)]; addStock(k, pk.each); got.push(k); }
@@ -2778,10 +2778,10 @@ function buyBoost(bo) {
   if (bo.id === 'kit') P.kits = (P.kits || 0) + 1;
   if (bo.id === 'xp2') P.xp2 = (P.xp2 || 0) + 3;
   if (bo.id === 'riv2') P.riv2 = (P.riv2 || 0) + 3;
-  saveProfile(); sfx('buy'); toast(`${bo.name}を買いました`); renderShop();
+  saveProfile(); sfx('buy'); toast(tr('{b}を買いました', { b: bo.name })); renderShop();
 }
 function exchangeGears() {
-  if (P.gears < EXCHANGE.gears) { toast('ギアが足りません'); return; }
+  if (P.gears < EXCHANGE.gears) { toast(tr('ギアが足りません')); return; }
   P.gears -= EXCHANGE.gears; P.rivets += EXCHANGE.rivets; saveProfile(); sfx('buy'); renderShop();
 }
 
@@ -2802,27 +2802,27 @@ function renderShop() {
   if (shopTab === 'pack') {
     for (const pk of PACKS) {
       const locked = pk.lv[0] > P.lv;
-      card(pk.name, locked ? `Lv${pk.lv[0]}で解放　${pk.desc}` : pk.desc, locked ? `${svg('lock')}Lv${pk.lv[0]}` : cost(pk), () => buyPack(pk), `<div class="crate">${svg('rocket')}</div>`, locked);
+      card(pk.name, locked ? tr('Lv{n}で解放　{d}', { n: pk.lv[0], d: pk.desc }) : pk.desc, locked ? `${svg('lock')}Lv${pk.lv[0]}` : cost(pk), () => buyPack(pk), `<div class="crate">${svg('rocket')}</div>`, locked);
     }
   } else if (shopTab === 'ammo') {
     const sale = saleWeapon();
     for (const k of Object.keys(AMMO_PRICE)) {
       if (WP[k].lv > P.lv) continue;
       const have = (P.stock && P.stock[k]) || 0, isSale = k === sale;
-      card(`${WP[k].name} ${AMMO_PACK}発`, `持ち越し ${have}発`, `${svg('rivet')}${ammoPrice(k)}`, () => { if (buyAmmo(k)) renderShop(); },
-        `<div class="wico">${svg(k)}</div>`, false, isSale ? `<em class="sale">${Math.round(SALE_OFF * 100)}%引き</em>` : '');
+      card(tr('{w} {n}発', { w: WP[k].name, n: AMMO_PACK }), tr('持ち越し {n}発', { n: have }), `${svg('rivet')}${ammoPrice(k)}`, () => { if (buyAmmo(k)) renderShop(); },
+        `<div class="wico">${svg(k)}</div>`, false, isSale ? `<em class="sale">${tr('{n}%引き', { n: Math.round(SALE_OFF * 100) })}</em>` : '');
     }
   } else if (shopTab === 'boost') {
     for (const bo of BOOSTS) {
-      const own = bo.id === 'kit' ? `所持 ${P.kits || 0}個` : bo.id === 'xp2' ? `残り ${P.xp2 || 0}試合` : `残り ${P.riv2 || 0}試合`;
+      const own = bo.id === 'kit' ? tr('所持 {n}個', { n: P.kits || 0 }) : tr('残り {n}試合', { n: bo.id === 'xp2' ? P.xp2 || 0 : P.riv2 || 0 });
       card(bo.name, `${bo.desc}　${own}`, cost(bo), () => buyBoost(bo), `<div class="wico">${svg(bo.id === 'kit' ? 'wrench' : bo.id === 'xp2' ? 'star' : 'rivet')}</div>`);
     }
   } else {
-    card('ギアをリベットに両替', `ギア${EXCHANGE.gears}枚 → リベット${EXCHANGE.rivets}`, `${svg('gear')}${EXCHANGE.gears}`, exchangeGears, `<div class="wico">${svg('gear')}</div>`);
+    card(tr('ギアをリベットに両替'), tr('ギア{g}枚 → リベット{r}', { g: EXCHANGE.gears, r: EXCHANGE.rivets }), `${svg('gear')}${EXCHANGE.gears}`, exchangeGears, `<div class="wico">${svg('gear')}</div>`);
     for (const g of GEAR_PACKS) {
-      card(g.name, `ギア ${g.gears}枚`, PAYMENTS_READY ? `${g.yen.toLocaleString()}円` : `${g.yen.toLocaleString()}円・準備中`, () => toast('お金での購入はまだ使えません'), `<div class="wico gear">${svg('gear')}</div>`, !PAYMENTS_READY);
+      card(g.name, tr('ギア {n}枚', { n: g.gears }), tr(PAYMENTS_READY ? '{y}円' : '{y}円・準備中', { y: g.yen.toLocaleString() }), () => toast(tr('お金での購入はまだ使えません')), `<div class="wico gear">${svg('gear')}</div>`, !PAYMENTS_READY);
     }
-    const note = document.createElement('p'); note.className = 'snote'; note.textContent = 'お金での購入は準備中です。ギアは勝利とレベルアップでも手に入ります。';
+    const note = document.createElement('p'); note.className = 'snote'; note.textContent = tr('お金での購入は準備中です。ギアは勝利とレベルアップでも手に入ります。');
     box.appendChild(note);
   }
 }
@@ -2832,7 +2832,7 @@ function showPackReveal(pk, got) {
   const row = el.querySelector('.got'); row.innerHTML = '';
   got.forEach((k, i) => {
     const d = document.createElement('div'); d.className = 'gotc'; d.style.animationDelay = `${i * 0.18}s`;
-    d.innerHTML = `${svg(k)}<b></b><small>+${pk.each}発</small>`; d.querySelector('b').textContent = WP[k].name; row.appendChild(d);
+    d.innerHTML = `${svg(k)}<b></b><small>${tr('+{n}発', { n: pk.each })}</small>`; d.querySelector('b').textContent = WP[k].name; row.appendChild(d);
   });
   renderShop();
 }
@@ -2844,17 +2844,280 @@ function offerAmmo(k) {
   if (S.offered[k]) return;
   S.offered[k] = true;
   const el = $('#offer');
-  el.innerHTML = `<div class="ot"><b></b><small>${AMMO_PACK}発パック　${k === saleWeapon() ? `<em>${Math.round(SALE_OFF * 100)}%引き</em>` : ''}</small></div><button class="buy">${svg('rivet')}${ammoPrice(k)}</button><button class="x" aria-label="閉じる">${svg('close')}</button>`;
-  el.querySelector('b').textContent = `${WP[k].name}の弾が切れた`;
+  el.innerHTML = `<div class="ot"><b></b><small>${tr('{n}発パック', { n: AMMO_PACK })}　${k === saleWeapon() ? `<em>${tr('{n}%引き', { n: Math.round(SALE_OFF * 100) })}</em>` : ''}</small></div><button class="buy">${svg('rivet')}${ammoPrice(k)}</button><button class="x" aria-label="${tr('閉じる')}">${svg('close')}</button>`;
+  el.querySelector('b').textContent = tr('{w}の弾が切れた', { w: WP[k].name });
   el.hidden = false; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-  el.querySelector('.buy').onclick = e => { e.stopPropagation(); if (buyAmmo(k, true)) { el.hidden = true; toast(`${WP[k].name} +${AMMO_PACK}発`); } };
+  el.querySelector('.buy').onclick = e => { e.stopPropagation(); if (buyAmmo(k, true)) { el.hidden = true; toast(tr('{w} +{n}', { w: WP[k].name, n: AMMO_PACK })); } };
   el.querySelector('.x').onclick = e => { e.stopPropagation(); el.hidden = true; };
   clearTimeout(offerAmmo.t); offerAmmo.t = setTimeout(() => { el.hidden = true; }, 7000);
 }
 
+// ---------------------------------------------------------------- 言語（日本語の文字列をそのまま鍵にして英語を引く）
+const EN = {
+  // 武器
+  'ロケット': 'Rocket', 'グレネード': 'Grenade', 'ハンマー': 'Hammer', '跳ねボール': 'Bouncy Ball', 'リボルバー': 'Revolver', '地雷': 'Mine',
+  '鉄球': 'Cannonball', '火炎ボトル': 'Fire Bottle', 'テレポ弾': 'Teleporter', '毒ガス': 'Poison Gas', 'ジェットパック': 'Jetpack', 'ワイヤーフック': 'Grapple Hook', 'パラシュート': 'Parachute',
+  // 能力値とパーツ
+  '攻撃': 'ATK', '装甲': 'Armor', 'HP': 'HP', 'ジャンプ': 'Jump', '速さ': 'Speed',
+  'ブラウン管': 'CRT', 'まる電球': 'Bulb', 'バケツ兜': 'Bucket Helm', '砲塔ヘッド': 'Turret Head', 'ブリキ缶': 'Tin Can', 'ドラム缶': 'Oil Drum',
+  'ボイラー': 'Boiler', 'タンク装甲': 'Tank Plate', 'ちょこ足': 'Stubby Legs', 'バネ足': 'Spring Legs', 'ローラー': 'Roller', 'ジェット脚': 'Jet Legs',
+  // ステージとキャラ
+  'サビ鉄キャニオン': 'Rust Canyon', 'コケ浮島': 'Moss Isles', 'ドックの修理工場': "Doc's Workshop",
+  'あなた': 'You', 'ポンコツ': 'Clunk', 'ネジマル': 'Screwy', 'ガラクタ': 'Scrap', 'ドック': 'Doc', 'かかし': 'Dummy',
+  // 試合中
+  'あなたの番': 'Your turn', '{name}の番': "{name}'s turn", '撃破 +{n}': 'KO +{n}', '毒': 'Poisoned', '修理 +{n}': 'Repair +{n}', 'リベット +50': 'Rivets +50',
+  'HP満タン': 'HP full', '{w} +{n}': '{w} +{n}', '{w}は Lv{n} で解放': '{w} unlocks at Lv{n}', '{w}の弾がありません': 'No {w} ammo left', '自分の番に使えます': 'Use it on your turn',
+  'ジャンプ長押しで上昇': 'Hold jump to fly', '左スティックを上に倒し続けると上昇': 'Hold the left stick up to fly', 'パラシュート準備。落ちると開く': 'Parachute ready. Opens when you fall',
+  '<b>左</b> 移動・上でジャンプ　<b>右</b> 引いて狙う・離して発射': '<b>Left</b> move, up to jump　<b>Right</b> pull to aim, release to fire',
+  '<b>A D</b> 移動　<b>Space</b> ジャンプ（長押しで高く）　<b>1〜0</b> 武器　<b>ホイール</b> 拡大縮小　<b>V</b> 全体<br><b>狙う方向へドラッグ</b>、長く引くほど強い、離すと発射（<b>↑ ↓</b> 角度 + <b>F</b> 長押しでも可）':
+    '<b>A D</b> move　<b>Space</b> jump (hold for higher)　<b>1-0</b> weapons　<b>Wheel</b> zoom　<b>V</b> overview<br><b>Drag toward your target</b>, longer is stronger, release to fire (or <b>↑ ↓</b> angle + hold <b>F</b>)',
+  '移動': 'Move',
+  // ロビー・結果
+  'やさしい': 'Easy', 'ふつう': 'Normal', 'つよい': 'Hard',
+  '目標達成！': 'Goal cleared!', '目標ならず': 'Goal missed', '試合終了': 'Match over', '勝利！': 'Victory!', '{n}位': '{n}th',
+  '次の話へ': 'Next chapter', 'もう一戦': 'Play again', 'ポイント': 'Points', '撃破 {n}': 'KOs {n}',
+  '第{n}話「{t}」　目標 {g}　{r}': 'Chapter {n} "{t}"　Goal: {g}　{r}', '達成': 'Cleared', '未達成': 'Missed',
+  'スコア': 'Score', 'ベスト更新': 'New best', '経験値': 'XP', 'リベット': 'Rivets', 'ギア': 'Gears', '初クリア報酬': 'First clear bonus',
+  'レベルアップ！ {u}': 'Level up! {u}', '{u} が解放': '{u} unlocked', '次の解放　<b>{w}</b>　Lv{n}': 'Next unlock　<b>{w}</b>　Lv{n}', '、': ', ',
+  // ストーリー一覧・タイトル
+  'ストーリー<small>はじめに：ドックの修理工場</small>': "Story<small>First: Doc's Workshop</small>", 'ストーリー<small>全話クリア</small>': 'Story<small>All chapters cleared</small>',
+  'ストーリー<small>第{n}話「{t}」</small>': 'Story<small>Chapter {n} "{t}"</small>',
+  'はじめに': 'First', '操作を覚える（チュートリアル）': 'Learn the controls (tutorial)', 'クリア': 'Cleared', 'まずはここ': 'Start here', '次はここ': 'Up next',
+  '第{n}話': 'Ch.{n}', '{s}　目標 {g}　CPU {d}': '{s}　Goal: {g}　CPU {d}', '{n}体撃破': '{n} KO', '1位': '1st place', '{n}位以内': 'Top {n}',
+  'スクラップ島': 'Scrap Island', '予選': 'Qualifier', '浮島の夜': 'Night on the Isles', '準決勝': 'Semifinal', '決勝': 'Final',
+  'チュートリアル完了　リベット +200': 'Tutorial complete　Rivets +200',
+  // ガレージ
+  '装備中': 'Equipped', '装備': 'Equip', '強化 ': 'Upgrade ', '最大': 'Max', 'ランク{n}': 'Rank {n}', 'リベットかギアが足りません': 'Not enough rivets or gears', 'リベットが足りません': 'Not enough rivets',
+  '基本パーツ': 'Basic part',
+  // ショップ
+  '鉄くずパック': 'Scrap Pack', 'サビ鉄パック': 'Rust Pack', 'ブラウン管パック': 'CRT Pack',
+  'Lv1〜3の武器から3種、各3発': '3 weapons from Lv1-3, 3 shots each', 'Lv4〜6の武器から3種、各3発': '3 weapons from Lv4-6, 3 shots each', 'Lv7以上の武器から3種、各4発': '3 weapons from Lv7+, 4 shots each',
+  '修理キット': 'Repair Kit', '試合で使える修理が1回増える（1試合に最大2個まで持ち込み）': '+1 repair per match (bring up to 2)',
+  '経験値2倍': 'Double XP', 'つぎの3試合、もらえる経験値が2倍': 'Double XP for your next 3 matches', 'リベット2倍': 'Double Rivets', 'つぎの3試合、もらえるリベットが2倍': 'Double rivets for your next 3 matches',
+  'ギア袋': 'Bag of Gears', 'ギア箱': 'Box of Gears', 'ギアの山': 'Pile of Gears', 'ギア倉庫': 'Gear Shed', 'ギアの金庫': 'Vault of Gears',
+  'Lv{n}で買えるようになります': 'Available at Lv{n}', '{b}を買いました': 'Bought {b}', 'ギアが足りません': 'Not enough gears',
+  'Lv{n}で解放　{d}': 'Unlocks at Lv{n}　{d}', '{w} {n}発': '{w} x{n}', '持ち越し {n}発': 'In stock: {n}', '{n}%引き': '{n}% OFF',
+  '所持 {n}個': 'Owned: {n}', '残り {n}試合': '{n} matches left', 'ギアをリベットに両替': 'Trade gears for rivets', 'ギア{g}枚 → リベット{r}': '{g} gears → {r} rivets',
+  'ギア {n}枚': '{n} gears', '{y}円': '¥{y}', '{y}円・準備中': '¥{y}　coming soon', 'お金での購入はまだ使えません': 'Real-money purchases are not available yet',
+  'お金での購入は準備中です。ギアは勝利とレベルアップでも手に入ります。': 'Real-money purchases are coming soon. You also earn gears by winning and leveling up.',
+  '+{n}発': '+{n} shots', '{n}発パック': 'Pack of {n}', '{w}の弾が切れた': 'Out of {w} ammo',
+  // チュートリアル
+  'まずは歩く。A・D キーで、旗のところまで行ってみい。': 'First, walk. Use the A and D keys to get to the flag.',
+  'まずは歩く。左スティックで、旗のところまで行ってみい。': 'First, walk. Use the left stick to get to the flag.',
+  'つぎは段差じゃ。Space でジャンプ。長く押すほど高く跳べる。空中でも左右に動けるぞ。': 'Now the ledge. Space jumps. Hold it longer to jump higher. You can steer in the air too.',
+  'つぎは段差じゃ。左スティックを上に倒すとジャンプ。倒し続けるほど高く跳べる。': 'Now the ledge. Push the left stick up to jump. Hold it up to jump higher.',
+  '向こうのかかしを撃ってみい。狙う方向へドラッグして、離すと発射じゃ。長く引くほど強い。': 'Shoot that dummy over there. Drag toward it and let go to fire. A longer drag means more power.',
+  '向こうのかかしを撃ってみい。右スティックを狙う方向へ引いて、離すと発射じゃ。長く引くほど強い。': 'Shoot that dummy over there. Pull the right stick toward it and let go to fire. Pull farther for more power.',
+  '武器は下のボタンか数字キーで替えられる。グレネード（2）を選んでみい。跳ねて、3秒で爆発する。': 'Switch weapons with the button below or the number keys. Pick the Grenade (2). It bounces and blows up after 3 seconds.',
+  '武器は下のボタンで替えられる。グレネードを選んでみい。跳ねて、3秒で爆発する。': 'Tap the weapon button below and pick the Grenade. It bounces and blows up after 3 seconds.',
+  '最後じゃ。かかしを水に落としてみい。足元を崩すか、爆風で吹き飛ばす。水に落ちたロボは錆びて止まる。': 'Last one. Knock the dummy into the water. Blow the ground out from under it, or blast it off. Robots that hit the water rust and stop.',
+  'よし。': 'Good.', 'うまい。': 'Nice.', 'その調子じゃ。': "That's the way.", 'それでいい。': 'Just right.', '見事じゃ。': 'Splendid.',
+  // 会話
+  'おう、目が覚めたか。わしはドック。この島の修理屋じゃ。': "Ah, ye're awake. I'm Doc, the island's repairman.",
+  '浜で止まっとったおまえを拾って、直しておいた。腕にロケットが付いとるな。': 'Found ye dead on the beach and patched ye up. Got a rocket on that arm, I see.',
+  '動かし方を思い出していけ。ここはわしの工場。いくら壊しても構わん。': "Let's get ye moving again. This is my workshop. Break whatever ye like.",
+  '上出来じゃ。あとは本番で覚えればいい。': "Well done. The rest ye'll learn in the real thing.",
+  '本番は4体で順番に撃ち合う。持ち時間は25秒。撃ったら残り5秒で、急いで隠れるんじゃ。': 'In a real match, four bots take turns. Ye get 25 seconds. Once ye fire, ye have 5 seconds to take cover.',
+  '当てたダメージと撃破で点が入る。4分たって、一番点が高いやつの勝ちじゃ。': 'Points come from damage and KOs. After 4 minutes, the highest score wins.',
+  '壊れても心配いらん。わしが直す。……さあ、外でポンコツが待っとるぞ。': "Don't fret about breaking. I'll fix ye. ...Now go, Clunk is waiting outside.",
+  'ここはスクラップ島。人間がいらなくなった機械を、捨てていった島じゃ。': "This is Scrap Island. Where humans dumped the machines they didn't want anymore.",
+  '人間はもう来ん。わしらの電気は、島の底にある「大電池」だけが頼りでな。': 'The humans never come back. All our power comes from the Great Battery under the island.',
+  'じゃが全員に配れるほどはない。昔はそれを奪い合って、本気の戦争をした。島は半分沈んだ。': "But there's not enough for everyone. Long ago we fought a real war over it. Half the island sank.",
+  'だから決まりを作った。年に一度の砲撃大会で、電気の取り分を決める。4体ずつ、順番に撃つ。壊れたら、わしが直す。': 'So we made rules. Once a year, a blasting tournament decides who gets the power. Four at a time, one shot each turn. Whoever breaks, I fix.',
+  '勝てば電気がたくさんもらえる。優勝すれば、新品の体もな。': 'Win, and ye get plenty of power. Win it all, and ye get a brand-new body.',
+  'あ、いたいた！ あなたも出るんでしょ？ まずは練習試合。1体でいいから落としてみて。': "There you are! You're entering too, right? Practice match first. Just knock out one bot.",
+  'やるじゃん！ 撃ち方、体が覚えてるんだね。': 'Not bad! Your body remembers how to shoot.',
+  'ふむ。浜で拾ったときは、ただのガラクタかと思ったがの。': 'Hmm. When I found ye on the beach, I took ye for plain junk.',
+  '次は予選。サビ鉄キャニオンで待ってる。': "Next up, the qualifier. I'll be waiting in Rust Canyon.",
+  '起きたばっかりだもんね。もう一回やろ。': 'You just woke up, after all. Let\'s go again.',
+  '新入りか。浜で拾われたブリキが大会とはな。電気がもったいない。': 'A rookie? A tin can from the beach in the tournament. What a waste of power.',
+  'ネジマルは電気を貯めこむのが趣味でな。ガラクタは前回の優勝者じゃ。': "Screwy likes to hoard power. Scrap is last year's champion.",
+  '妙なやつでな。毎年勝つのに、電気を一度も受け取らん。': 'Odd one, that. Wins every year, never takes a drop of power.',
+  '予選は2位まで通過だ。せいぜい3位を取り合え。': 'Top two advance. Fight over third place, if you like.',
+  'ぐぬぬ。プロペラが曲がった。': 'Grr. My propeller is bent.',
+  '予選突破！ 本戦は浮島だよ。': "We're through! The main event is on the Moss Isles.",
+  '見たか。これが格の違いだ。': "See? That's the difference in class.",
+  '気にするな。壊れたところは直しておく。': "Never mind. I'll fix whatever broke.",
+  'ここから本戦。浮島は足場が狭いから、落とし合いになるよ。': "The main event starts here. The isles are narrow, so it's all about knocking each other off.",
+  'ドックの工場にね、昔の優勝トロフィーがあるの。そこに写ってるロボ、あなたと同じブラウン管頭なんだ。': "There's an old trophy in Doc's workshop. The robot in the photo has a CRT head, just like you.",
+  'ま、今日は手加減しないけどね！': "Anyway, I'm not going easy on you today!",
+  '負けたー。でも楽しかった。': 'I lost! But that was fun.',
+  'トロフィーの写真、あとでドックに見せてもらお。': "Let's ask Doc to show us that trophy photo later.",
+  '今日はわたしの勝ち！ 落とし合いは、足場を先に崩した方が勝つよ。': 'I win today! Whoever breaks the ground first wins these.',
+  '本気でいく。予選の借りは返す。': "No holding back. I'm paying you back for the qualifier.",
+  'トロフィーの写真か。……あれは、昔のガラクタじゃ。': "The trophy photo, eh. ...That's Scrap, from long ago.",
+  '大会を始めた年、あいつは頭をなくした。わしが直したが、同じ部品はもうなかった。': "The year the tournament began, he lost his head. I fixed him, but there were no matching parts left.",
+  '……決勝、行ってこい。負けたら許さん。': "...Go to the final. Lose and I'll never forgive you.",
+  '決勝だよ！ 相手はもちろん、ガラクタ。': "It's the final! And of course, it's Scrap.",
+  '借りは返した。悔しければ、また来い。': 'Debt repaid. Come back if it stings.',
+  '決勝じゃ。島じゅうのロボが見とる。': "The final. Every bot on the island is watching.",
+  '……その画面。まだ映るのか。': '...That screen. It still works?',
+  'ならば、映してみせろ。': 'Then show me.',
+  '……いい画だった。': '...That was a good picture.',
+  'わたしが勝ち続けたのは、電気を島じゅうに配るためだ。勝った者が、取り分を決められる。': 'I kept winning so I could share the power with the whole island. The winner decides who gets what.',
+  '次は、おまえが決めろ。': 'Now you decide.',
+  '優勝ー！ 新品の体、どうする？': 'Champion! So, what about that new body?',
+  'その年、大電池の電気は島じゅうに配られた。ブラウン管頭は、新品の体を断ったそうじゃ。': 'That year, the Great Battery\'s power reached every corner of the island. They say the CRT head turned down the new body.',
+  'まだ映りが甘い。また来い。': 'Your picture is still fuzzy. Come again.',
+  '……': '...',
+  // 遊び方
+  'タップで閉じる': 'Tap to close',
+  'A / D': 'A / D', '歩く': 'Walk', 'Space・W・Enter': 'Space / W / Enter', 'ジャンプ。長押しで高く、空中でも左右に動ける': 'Jump. Hold for higher. You can steer in the air',
+  'ドラッグして離す': 'Drag and release', '狙う方向へ引いて離すと発射。長く引くほど強い': 'Drag toward your target and release to fire. Longer is stronger',
+  '↑ ↓ ＋ F長押し': '↑ ↓ + hold F', 'キーボードだけで狙って撃つ': 'Aim and fire with the keyboard only', '1〜0 / Q・E': '1-0 / Q, E', '武器を選ぶ': 'Choose a weapon',
+  'ホイール / V': 'Wheel / V', '拡大縮小 / 全体を見る': 'Zoom / overview', 'R': 'R', '修理（1試合2回）': 'Repair (2 per match)', 'P / Esc': 'P / Esc', '一時停止する': 'Pause',
+  '左スティック': 'Left stick', '倒した方へ歩く。上に倒すとジャンプ、倒し続けると高く跳べる。空中でも左右に動ける': 'Walk the way you push. Push up to jump, hold for higher. You can steer in the air',
+  '右スティック': 'Right stick', '狙う方向へ引いて、離すと発射。長く引くほど強い。真ん中に戻すと取り消し': 'Pull toward your target and release to fire. Pull farther for more power. Return to center to cancel',
+  '武器ボタン': 'Weapon button', '下のボタンで武器を選ぶ。ジェットパックなど移動アイテムもここ': 'Pick a weapon with the bottom button. Movement items like the Jetpack are here too',
+  '修理ボタン': 'Repair button', 'HPを35回復（1試合2回）': 'Restore 35 HP (2 per match)', 'ミニマップ': 'Minimap', '右上の地図を押すと全体を見られる': 'Tap the map at top right for an overview',
+  '4体で順番に撃ち合う。持ち時間は25秒、撃ったら残り5秒で隠れる。': 'Four bots take turns. You get 25 seconds; after you fire, 5 seconds to hide.',
+  '当てたダメージと撃破で点が入る。4分で一番点が高いロボの勝ち。': 'Damage and KOs score points. Highest score after 4 minutes wins.',
+  '水に落ちると退場。次の自分の番に復活する。': 'Fall in the water and you are out until your next turn.',
+};
+// HTML に直書きの文字
+Object.assign(EN, {
+  'BOOM BOLTS ブリキロボの砲撃戦': 'BOOM BOLTS Tin Robot Artillery', 'ブリキロボの砲撃戦': 'Tin Robot Artillery',
+  'ストーリー': 'Story', 'フリー対戦': 'Free Battle', 'ガレージ': 'Garage', 'ショップ': 'Shop', 'セール 残り': 'Sale ends in', '遊び方': 'How to play',
+  '4体で4分のデスマッチ。順番に1体ずつ動き、撃ったら5秒で逃げる。': '4 bots, 4 minutes. Take turns, and after you fire, you have 5 seconds to run.',
+  '当てたダメージと撃破でポイント。地面を崩して水に落とすのが一番早い。': 'Score with damage and KOs. Knocking foes into the water is fastest.',
+  '戻る': 'Back', 'ステージ': 'Stage', 'CPUの強さ': 'CPU level', '対戦開始': 'Start',
+  'スクラップ島の砲撃大会。優勝すれば新品の体がもらえる。': 'The Scrap Island blasting tournament. Win it, and you get a brand-new body.',
+  '本日のセール　残り': "Today's sale ends in", '武器パック': 'Packs', '弾': 'Ammo', 'ブースト': 'Boosts',
+  '頭': 'Head', '胴': 'Body', '脚': 'Legs', 'ロビー': 'Lobby', 'モード': 'Mode', 'デスマッチ 4分': 'Deathmatch 4 min', 'CPU': 'CPU',
+  '一時停止': 'Paused', '再開': 'Resume', 'タイトルへ': 'Title', 'スキップ': 'Skip', '修理': 'Repair', '横向きにしてください': 'Please rotate your device',
+  'タイトル': 'Title', '勝利！': 'Victory!',
+  '全体を見る': 'Overview', '音': 'Sound', '武器を選ぶ': 'Choose weapon', 'ミニマップ。押すと全体表示': 'Minimap. Tap for overview',
+  'PC': 'PC', 'スマホ': 'Phone', '閉じる': 'Close',
+});
+
+let LANG = 'ja';
+try { LANG = localStorage.getItem('boombolts.lang') || ((navigator.language || 'ja').startsWith('ja') ? 'ja' : 'en'); } catch (e) { LANG = (navigator.language || 'ja').startsWith('ja') ? 'ja' : 'en'; }
+function tr(ja, vars) {
+  let s = LANG === 'en' && EN[ja] != null ? EN[ja] : ja;
+  if (vars) for (const k in vars) s = s.split(`{${k}}`).join(vars[k]);
+  if (LANG === 'en' && ja === '{n}位' && vars) { const n = +vars.n; s = n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'); }
+  return s;
+}
+// データの名前を言語に合わせて差し替える
+const I18N_DATA = [];
+function i18nData() {
+  if (!I18N_DATA.length) {
+    for (const k in WP) I18N_DATA.push([WP[k], 'name']);
+    for (const p of PARTS) I18N_DATA.push([p, 'name']);
+    for (const k in STAGES) I18N_DATA.push([STAGES[k], 'name']);
+    for (const b of BOTS) I18N_DATA.push([b, 'name']);
+    for (const c of STORY) I18N_DATA.push([c, 'title']);
+    for (const x of PACKS) { I18N_DATA.push([x, 'name']); I18N_DATA.push([x, 'desc']); }
+    for (const x of BOOSTS) { I18N_DATA.push([x, 'name']); I18N_DATA.push([x, 'desc']); }
+    for (const x of GEAR_PACKS) I18N_DATA.push([x, 'name']);
+    I18N_DATA.push([DOC, 'name']);
+    for (const k in STAT_NAME) I18N_DATA.push([STAT_NAME, k]);
+    for (const [o, f] of I18N_DATA) o['_ja_' + f] = o[f];
+  }
+  for (const [o, f] of I18N_DATA) o[f] = tr(o['_ja_' + f]);
+}
+// HTML に直書きの文字（と aria-label）を差し替える
+const I18N_NODES = [];
+function i18nDom() {
+  if (!I18N_NODES.length) {
+    const jp = /[぀-ヿ一-鿿]/;
+    const walk = n => {
+      if (n.nodeType === 3) { const t = n.nodeValue.trim(); if (t && jp.test(t)) I18N_NODES.push({ n, ja: t, raw: n.nodeValue }); return; }
+      if (n.nodeType !== 1 || n.tagName === 'SCRIPT' || n.tagName === 'STYLE' || n.tagName === 'CANVAS') return;
+      if (n.hasAttribute && n.hasAttribute('aria-label') && jp.test(n.getAttribute('aria-label'))) I18N_NODES.push({ el: n, attr: 'aria-label', ja: n.getAttribute('aria-label') });
+      for (const c of n.childNodes) walk(c);
+    };
+    walk(document.body);
+    I18N_NODES.push({ title: true, ja: document.title });
+  }
+  for (const x of I18N_NODES) {
+    if (x.title) document.title = tr(x.ja);
+    else if (x.attr) x.el.setAttribute(x.attr, tr(x.ja));
+    else x.n.nodeValue = x.raw.replace(x.ja, tr(x.ja));
+  }
+  document.documentElement.lang = LANG;
+  document.body.classList.toggle('en', LANG === 'en');
+}
+function setLang(l) {
+  LANG = l; try { localStorage.setItem('boombolts.lang', l); } catch (e) {}
+  i18nData(); i18nDom();
+  for (const bt of document.querySelectorAll('#langSw button')) bt.classList.toggle('sel', bt.dataset.l === LANG);
+}
+
+// ---------------------------------------------------------------- 遊び方とスマホの指ガイド
+const HOWTO = {
+  pc: [
+    ['keys', 'A / D', '歩く'],
+    ['keys', 'Space・W・Enter', 'ジャンプ。長押しで高く、空中でも左右に動ける'],
+    ['drag', 'ドラッグして離す', '狙う方向へ引いて離すと発射。長く引くほど強い'],
+    ['keys', '↑ ↓ ＋ F長押し', 'キーボードだけで狙って撃つ'],
+    ['keys', '1〜0 / Q・E', '武器を選ぶ'],
+    ['keys', 'ホイール / V', '拡大縮小 / 全体を見る'],
+    ['keys', 'R', '修理（1試合2回）'],
+    ['keys', 'P / Esc', '一時停止する'],
+  ],
+  sp: [
+    ['stickL', '左スティック', '倒した方へ歩く。上に倒すとジャンプ、倒し続けると高く跳べる。空中でも左右に動ける'],
+    ['stickR', '右スティック', '狙う方向へ引いて、離すと発射。長く引くほど強い。真ん中に戻すと取り消し'],
+    ['btnW', '武器ボタン', '下のボタンで武器を選ぶ。ジェットパックなど移動アイテムもここ'],
+    ['btnR', '修理ボタン', 'HPを35回復（1試合2回）'],
+    ['map', 'ミニマップ', '右上の地図を押すと全体を見られる'],
+  ],
+  rules: ['4体で順番に撃ち合う。持ち時間は25秒、撃ったら残り5秒で隠れる。', '当てたダメージと撃破で点が入る。4分で一番点が高いロボの勝ち。', '水に落ちると退場。次の自分の番に復活する。'],
+};
+const HOWTO_ICON = {
+  keys: '<rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7 11h1M11 11h1M15 11h1M8 14h8"/>',
+  drag: '<circle cx="7" cy="16" r="2.5"/><path d="M9 14l9-8"/><path d="M13 6h5v5"/>',
+  stickL: '<circle cx="12" cy="12" r="8"/><circle cx="15" cy="10" r="3.2"/><path d="M4 12h3M12 4v3"/>',
+  stickR: '<circle cx="12" cy="12" r="8"/><circle cx="9" cy="15" r="3.2"/><path d="M14 10l5-5M15 5h4v4"/>',
+  btnW: '<rect x="3" y="8" width="18" height="9" rx="2.5"/><path d="M7 14l3-3 2 1 4-3"/>',
+  btnR: '<rect x="3" y="8" width="18" height="9" rx="2.5"/><path d="M12 10v5M9.5 12.5h5"/>',
+  map: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-4 4 3 3-2 6 4"/><rect x="11" y="8" width="6" height="4"/>',
+};
+let howtoTab = null;
+function openHowto(from) {
+  howtoTab = howtoTab || (document.body.classList.contains('touch') ? 'sp' : 'pc');
+  S.howtoFrom = from || 'title';
+  if (from === 'pause') { $('#howto').hidden = false; $('#pause').hidden = true; } else showScreen('#howto');
+  renderHowto();
+}
+function renderHowto() {
+  for (const bt of document.querySelectorAll('#howtoTabs button')) bt.classList.toggle('sel', bt.dataset.t === howtoTab);
+  const box = $('#howtoList'); box.innerHTML = '';
+  for (const [ic, k, d] of HOWTO[howtoTab]) {
+    const el = document.createElement('div'); el.className = 'hrow';
+    el.innerHTML = `<span class="hic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${HOWTO_ICON[ic]}</svg></span><b></b><span class="hd"></span>`;
+    el.querySelector('b').textContent = tr(k); el.querySelector('.hd').textContent = tr(d);
+    box.appendChild(el);
+  }
+  const r = $('#howtoRules'); r.innerHTML = '';
+  for (const line of HOWTO.rules) { const li = document.createElement('li'); li.textContent = tr(line); r.appendChild(li); }
+}
+function closeHowto() {
+  if (S.howtoFrom === 'pause') { $('#howto').hidden = true; $('#pause').hidden = false; }
+  else { showScreen('#title'); refreshTitle(); }
+}
+// スマホのチュートリアル: 今やる操作を、スティックやボタンの上で指が実演する
+function updateGuide() {
+  const g = $('#guide');
+  const T2 = S.tutorial, touch = document.body.classList.contains('touch');
+  if (!T2 || T2.step < 0 || T2.step >= TUT_STEPS.length || T2.okT > 0 || !touch || !$('#talk').hidden || S.paused) { if (!g.hidden) g.hidden = true; return; }
+  const key = TUT_STEPS[T2.step].key;
+  let el = null, anim = 'tap';
+  if (key === 'walk') { el = stickEls.L; anim = 'right'; }
+  else if (key === 'jump') { el = stickEls.L; anim = 'up'; }
+  else if (key === 'fire' || key === 'drop') { el = stickEls.R; anim = 'upright'; }
+  else if (key === 'swap') { el = !$('#tray').hidden ? document.querySelector('#tray .wbtn[data-k="grenade"]') : $('#wslot'); anim = 'tap'; }
+  if (!el) { g.hidden = true; return; }
+  const r = el.getBoundingClientRect();
+  g.hidden = false;
+  g.style.left = (r.left + r.width / 2) + 'px'; g.style.top = (r.top + r.height / 2) + 'px';
+  if (g.dataset.anim !== anim) { g.dataset.anim = anim; g.className = 'g-' + anim; }
+}
+
 // ---------------------------------------------------------------- 画面とHUD
 function showScreen(id) {
-  for (const s of ['#title', '#garage', '#result', '#pause', '#story', '#shop', '#free']) $(s).hidden = s !== id;
+  for (const s of ['#title', '#garage', '#result', '#pause', '#story', '#shop', '#free', '#howto']) $(s).hidden = s !== id;
   $('#offer').hidden = true;
 }
 function inMatch() { return ['lobby', 'banner', 'turn', 'retreat', 'settle', 'over'].includes(S.phase); }
@@ -2878,7 +3141,7 @@ function buildTray() {
   if (!me) return;
   WORDER.forEach((k, i) => {
     const bt = document.createElement('button'); bt.className = 'wbtn'; bt.dataset.k = k;
-    bt.innerHTML = `${svg(k)}<span>${WP[k].name}</span><em></em>${i < 10 ? `<kbd>${(i + 1) % 10}</kbd>` : '<kbd>移動</kbd>'}`;
+    bt.innerHTML = `${svg(k)}<span>${WP[k].name}</span><em></em>${i < 10 ? `<kbd>${(i + 1) % 10}</kbd>` : `<kbd>${tr('移動')}</kbd>`}`;
     bt.addEventListener('click', e => { e.stopPropagation(); selectWeapon(k); tray.hidden = true; });
     tray.appendChild(bt);
   });
@@ -2886,15 +3149,15 @@ function buildTray() {
 function selectWeapon(k) {
   const me = S.bots.find(b => b.human);
   if (!me) return;
-  if (WP[k].lv > P.lv) { toast(`${WP[k].name}は Lv${WP[k].lv} で解放`); return; }
-  if (!(me.ammo[k] > 0)) { toast(`${WP[k].name}の弾がありません`); return; }
+  if (WP[k].lv > P.lv) { toast(tr('{w}は Lv{n} で解放', { w: WP[k].name, n: WP[k].lv })); return; }
+  if (!(me.ammo[k] > 0)) { toast(tr('{w}の弾がありません', { w: WP[k].name })); return; }
   // ジェットパックとパラシュートは選んだ瞬間に使う（狙う必要がない）
   if (k === 'jet' || k === 'chute') {
-    if (S.active !== me || !me.alive || !(S.phase === 'turn' || S.phase === 'retreat')) { toast('自分の番に使えます'); return; }
+    if (S.active !== me || !me.alive || !(S.phase === 'turn' || S.phase === 'retreat')) { toast(tr('自分の番に使えます')); return; }
     if ((k === 'jet' && me.jet) || (k === 'chute' && me.chute)) return;
     const keep = me.weapon; me.weapon = k; useMove(me, k, me.aim);
     me.weapon = me.ammo[keep] > 0 ? keep : 'rocket';
-    toast(k === 'jet' ? 'ジャンプ長押しで上昇' : 'パラシュート準備。落ちると開く');
+    toast(tr(k === 'jet' ? (document.body.classList.contains('touch') ? '左スティックを上に倒し続けると上昇' : 'ジャンプ長押しで上昇') : 'パラシュート準備。落ちると開く'));
     return;
   }
   me.weapon = k; S.charge = null;
@@ -2910,8 +3173,8 @@ function showHint(on) {
   if (!on) { el.hidden = true; return; }
   const touch = document.body.classList.contains('touch');
   el.innerHTML = touch
-    ? '<b>左</b> 移動・上でジャンプ　<b>右</b> 引いて狙う・離して発射'
-    : '<b>A D</b> 移動　<b>Space</b> ジャンプ（長押しで高く）　<b>1〜0</b> 武器　<b>ホイール</b> 拡大縮小　<b>V</b> 全体<br><b>狙う方向へドラッグ</b>、長く引くほど強い、離すと発射（<b>↑ ↓</b> 角度 + <b>F</b> 長押しでも可）';
+    ? tr('<b>左</b> 移動・上でジャンプ　<b>右</b> 引いて狙う・離して発射')
+    : tr('<b>A D</b> 移動　<b>Space</b> ジャンプ（長押しで高く）　<b>1〜0</b> 武器　<b>ホイール</b> 拡大縮小　<b>V</b> 全体<br><b>狙う方向へドラッグ</b>、長く引くほど強い、離すと発射（<b>↑ ↓</b> 角度 + <b>F</b> 長押しでも可）');
   el.hidden = false;
 }
 const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -2965,7 +3228,7 @@ function showLobby() {
     requestAnimationFrame(() => paintPortrait(el.querySelector('canvas'), b, 1.6, 0.82));
   }
   $('#lobbyStage').textContent = T.st.name;
-  $('#lobbyDiff').textContent = { easy: 'やさしい', normal: 'ふつう', hard: 'つよい' }[S.diff];
+  $('#lobbyDiff').textContent = tr({ easy: 'やさしい', normal: 'ふつう', hard: 'つよい' }[S.diff]);
 }
 function lobbyTick() { setText('#lobbyCount', String(Math.max(0, Math.ceil(S.phaseT)))); }
 
@@ -2975,16 +3238,16 @@ function showResult() {
   const { rank, reward } = S.result, me = S.bots.find(b => b.human);
   const place = me ? rank.indexOf(me) + 1 : 0;
   const sr = S.result.story;
-  $('#resHead').textContent = sr ? (sr.success ? '目標達成！' : '目標ならず') : !me ? '試合終了' : place === 1 ? '勝利！' : `${place}位`;
+  $('#resHead').textContent = sr ? tr(sr.success ? '目標達成！' : '目標ならず') : !me ? tr('試合終了') : place === 1 ? tr('勝利！') : tr('{n}位', { n: place });
   const hasNext = sr && sr.success && sr.idx + 1 < STORY.length;
-  $('#bAgain').textContent = hasNext ? '次の話へ' : 'もう一戦';
+  $('#bAgain').textContent = tr(hasNext ? '次の話へ' : 'もう一戦');
   S.againAction = hasNext ? () => playChapter(sr.idx + 1) : sr ? () => playChapter(sr.idx) : () => startMatch({ stage: S.stageKey, diff: S.diff });
   const pod = $('#podium'); pod.innerHTML = '';
   const order = [1, 0, 2, 3].filter(i => i < rank.length);
   rank.forEach((b, i) => { b.mood = i === 0 ? 'happy' : i === rank.length - 1 ? 'sad' : i === 1 ? 'smug' : 'idle'; });
   for (const i of order) {
     const b = rank[i], el = document.createElement('div'); el.className = `pc p${i + 1}`; el.style.setProperty('--c', b.color);
-    el.innerHTML = `<div class="pts"><small>ポイント</small><b>${b.score}</b></div><canvas></canvas><div class="col"><span class="nm"></span><b>${i + 1}</b><small>撃破 ${b.kills}</small></div>`;
+    el.innerHTML = `<div class="pts"><small>${tr('ポイント')}</small><b>${b.score}</b></div><canvas></canvas><div class="col"><span class="nm"></span><b>${i + 1}</b><small>${tr('撃破 {n}', { n: b.kills })}</small></div>`;
     el.querySelector('.nm').textContent = b.name;
     pod.appendChild(el);
     requestAnimationFrame(() => paintPortrait(el.querySelector('canvas'), b, 1.5, 0.85));
@@ -2994,18 +3257,18 @@ function showResult() {
   const stars = [1, 2, 3].map(n => `<span class="${n <= reward.stars ? 'on' : ''}">${svg('star')}</span>`).join('');
   const nextW = WORDER.map(k => WP[k]).find(w => w.lv > P.lv);
   side.innerHTML = `
-    ${sr ? `<p class="goal ${sr.success ? 'ok' : 'ng'}">第${sr.idx + 1}話「${sr.ch.title}」　目標 ${goalText(sr.ch.goal)}　${sr.success ? '達成' : '未達成'}</p>` : ''}
+    ${sr ? `<p class="goal ${sr.success ? 'ok' : 'ng'}">${tr('第{n}話「{t}」　目標 {g}　{r}', { n: sr.idx + 1, t: sr.ch.title, g: goalText(sr.ch.goal), r: tr(sr.success ? '達成' : '未達成') })}</p>` : ''}
     <div class="stars">${stars}</div>
     <dl>
-      <dt>スコア</dt><dd>${me.score}${reward.newBest ? '<i>ベスト更新</i>' : ''}</dd>
-      <dt>経験値</dt><dd>+${reward.xp}</dd>
-      <dt>${svg('rivet')}リベット</dt><dd>+${reward.rivets}</dd>
-      ${reward.gears ? `<dt>${svg('gear')}ギア</dt><dd>+${reward.gears}</dd>` : ''}
-      ${sr && sr.first ? `<dt>初クリア報酬</dt><dd>${svg('rivet')}${sr.ch.reward.rivets} ${svg('gear')}${sr.ch.reward.gears}</dd>` : ''}
+      <dt>${tr('スコア')}</dt><dd>${me.score}${reward.newBest ? `<i>${tr('ベスト更新')}</i>` : ''}</dd>
+      <dt>${tr('経験値')}</dt><dd>+${reward.xp}</dd>
+      <dt>${svg('rivet')}${tr('リベット')}</dt><dd>+${reward.rivets}</dd>
+      ${reward.gears ? `<dt>${svg('gear')}${tr('ギア')}</dt><dd>+${reward.gears}</dd>` : ''}
+      ${sr && sr.first ? `<dt>${tr('初クリア報酬')}</dt><dd>${svg('rivet')}${sr.ch.reward.rivets} ${svg('gear')}${sr.ch.reward.gears}</dd>` : ''}
     </dl>
     <div class="lvbar"><span>Lv ${P.lv}</span><i><i style="width:${(P.xp / xpNeed(P.lv) * 100).toFixed(1)}%"></i></i><small>${P.xp} / ${xpNeed(P.lv)}</small></div>
-    ${reward.levelUp ? `<p class="lvup">レベルアップ！ ${reward.unlocked.length ? reward.unlocked.join('、') + ' が解放' : ''}</p>` : ''}
-    ${nextW ? `<p class="next">次の解放　<b>${nextW.name}</b>　Lv${nextW.lv}</p>` : ''}`;
+    ${reward.levelUp ? `<p class="lvup">${tr('レベルアップ！ {u}', { u: reward.unlocked.length ? tr('{u} が解放', { u: reward.unlocked.map(x => tr(x)).join(tr('、')) }) : '' })}</p>` : ''}
+    ${nextW ? `<p class="next">${tr('次の解放　<b>{w}</b>　Lv{n}', { w: nextW.name, n: nextW.lv })}</p>` : ''}`;
 }
 
 // ---------------------------------------------------------------- タイトル・ガレージ
@@ -3046,7 +3309,7 @@ function refreshTitle() {
   for (const bt of document.querySelectorAll('#stages .stage')) bt.classList.toggle('sel', bt.dataset.k === selStage);
   for (const bt of document.querySelectorAll('#diff button')) bt.classList.toggle('sel', bt.dataset.d === selDiff);
   const nx = P.story || 0;
-  $('#bStory').innerHTML = !P.tut ? 'ストーリー<small>はじめに：ドックの修理工場</small>' : nx >= STORY.length ? 'ストーリー<small>全話クリア</small>' : `ストーリー<small>第${nx + 1}話「${STORY[nx].title}」</small>`;
+  $('#bStory').innerHTML = !P.tut ? tr('ストーリー<small>はじめに：ドックの修理工場</small>') : nx >= STORY.length ? tr('ストーリー<small>全話クリア</small>') : tr('ストーリー<small>第{n}話「{t}」</small>', { n: nx + 1, t: STORY[nx].title });
   $('#tLv').textContent = `Lv ${P.lv}`;
   $('#tRiv').textContent = P.rivets; $('#tGear').textContent = P.gears;
   $('#tXp').style.width = `${(P.xp / xpNeed(P.lv) * 100).toFixed(1)}%`;
@@ -3082,16 +3345,16 @@ function renderGarage() {
     const owned = p.id in P.owned, lv = P.owned[p.id] || 0, locked = TIER_LV[p.tier] > P.lv, equipped = P.eq[p.slot] === p.id;
     const s = partStats(p.id, lv), nxt = owned && lv < MAX_UP ? partStats(p.id, lv + 1) : null;
     const el = document.createElement('div'); el.className = 'part' + (equipped ? ' eq' : '') + (locked ? ' locked' : '');
-    const statTxt = STAT_KEYS.filter(k => s[k] || (nxt && nxt[k])).map(k => `<span>${STAT_NAME[k]} ${k === 'hp' ? '+' + s[k] : '+' + s[k] + '%'}${nxt && nxt[k] !== s[k] ? `<i>→${nxt[k]}${k === 'hp' ? '' : '%'}</i>` : ''}</span>`).join('') || '<span>基本パーツ</span>';
+    const statTxt = STAT_KEYS.filter(k => s[k] || (nxt && nxt[k])).map(k => `<span>${STAT_NAME[k]} ${k === 'hp' ? '+' + s[k] : '+' + s[k] + '%'}${nxt && nxt[k] !== s[k] ? `<i>→${nxt[k]}${k === 'hp' ? '' : '%'}</i>` : ''}</span>`).join('') || `<span>${tr('基本パーツ')}</span>`;
     const pips = owned ? `<span class="pips">${[0, 1, 2].map(n => `<i class="${n < lv ? 'on' : ''}"></i>`).join('')}</span>` : '';
     let action = '';
     if (locked) action = `<button disabled>${svg('lock')}Lv${TIER_LV[p.tier]}</button>`;
     else if (!owned) action = `<button data-a="buy">${svg('rivet')}${p.cost}${p.gears ? ` ${svg('gear')}${p.gears}` : ''}</button>`;
     else {
-      action = (equipped ? '<button class="ghost" disabled>装備中</button>' : '<button data-a="eq">装備</button>') +
-        (lv < MAX_UP ? `<button data-a="up">強化 ${svg('rivet')}${upCost(p, lv)}</button>` : '<button class="ghost" disabled>最大</button>');
+      action = (equipped ? `<button class="ghost" disabled>${tr('装備中')}</button>` : `<button data-a="eq">${tr('装備')}</button>`) +
+        (lv < MAX_UP ? `<button data-a="up">${tr('強化 ')}${svg('rivet')}${upCost(p, lv)}</button>` : `<button class="ghost" disabled>${tr('最大')}</button>`);
     }
-    el.innerHTML = `<canvas></canvas><div class="pi"><div class="pn"><b></b><small>ランク${p.tier}</small>${pips}</div><div class="ps">${statTxt}</div></div><div class="pa">${action}</div>`;
+    el.innerHTML = `<canvas></canvas><div class="pi"><div class="pn"><b></b><small>${tr('ランク{n}', { n: p.tier })}</small>${pips}</div><div class="ps">${statTxt}</div></div><div class="pa">${action}</div>`;
     el.querySelector('.pn b').textContent = p.name;
     list.appendChild(el);
     const pb = { ...meBot, eq: { ...P.eq, [p.slot]: p.id } };
@@ -3101,13 +3364,13 @@ function renderGarage() {
 }
 function partAction(p, a) {
   if (a === 'buy') {
-    if (P.rivets < p.cost || P.gears < (p.gears || 0)) { toast('リベットかギアが足りません'); return; }
+    if (P.rivets < p.cost || P.gears < (p.gears || 0)) { toast(tr('リベットかギアが足りません')); return; }
     P.rivets -= p.cost; P.gears -= p.gears || 0; P.owned[p.id] = 0; P.eq[p.slot] = p.id; sfx('buy');
   } else if (a === 'eq') { P.eq[p.slot] = p.id; sfx('pick'); }
   else if (a === 'up') {
     const lv = P.owned[p.id] || 0, cost = upCost(p, lv);
     if (lv >= MAX_UP) return;
-    if (P.rivets < cost) { toast('リベットが足りません'); return; }
+    if (P.rivets < cost) { toast(tr('リベットが足りません')); return; }
     P.rivets -= cost; P.owned[p.id] = lv + 1; sfx('buy');
   }
   saveProfile(); renderGarage();
@@ -3257,6 +3520,15 @@ $('#bFreeGo').addEventListener('click', () => { auInit(); startMatch({ stage: se
 $('#bFreeBack').addEventListener('click', () => { showScreen('#title'); refreshTitle(); });
 $('#bGarage').addEventListener('click', () => { auInit(); openGarage(); });
 $('#bShop').addEventListener('click', () => { auInit(); openShop(); });
+$('#bHowto').addEventListener('click', () => { auInit(); openHowto('title'); });
+$('#bPauseHowto').addEventListener('click', () => openHowto('pause'));
+$('#bHowtoBack').addEventListener('click', closeHowto);
+for (const bt of document.querySelectorAll('#howtoTabs button')) bt.addEventListener('click', () => { howtoTab = bt.dataset.t; renderHowto(); });
+for (const bt of document.querySelectorAll('#langSw button')) bt.addEventListener('click', () => {
+  setLang(bt.dataset.l);
+  for (const sp of document.querySelectorAll('#stages .stage span')) { const k = sp.parentElement.dataset.k; sp.textContent = STAGES[k].name; }
+  goTitle();
+});
 $('#bShopBack').addEventListener('click', () => { showScreen('#title'); refreshTitle(); });
 for (const bt of document.querySelectorAll('#shopTabs button')) bt.addEventListener('click', () => { shopTab = bt.dataset.t; renderShop(); });
 $('#reveal').addEventListener('click', () => { $('#reveal').hidden = true; });
@@ -3287,7 +3559,7 @@ function frame() {
     while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
     if (n === 6) acc = 0;
   }
-  render(); updateHud(); talkTick();
+  render(); updateHud(); talkTick(); updateGuide();
 }
 
 // ---------------------------------------------------------------- 検証用
@@ -3304,7 +3576,7 @@ window.bb = {
   get profile() { return P; },
   render, update, showResult, openGarage, goTitle, finish, moodOf, auInit, playSong, sfx, get AU() { return AU; },
   SFX_NAMES: ['boom', 'launch', 'throw', 'shot', 'jump', 'land', 'step', 'bounce', 'splash', 'beep', 'pick', 'turn', 'myturn', 'tick', 'clang', 'whoosh', 'warp', 'fire', 'gas', 'hurt', 'yay', 'scream', 'ko', 'crate', 'click', 'buy', 'win', 'lose'],
-  carveAt(x, y, r) { carve(x, y, r); }, openShop, buyAmmo, buyPack, PACKS, offerAmmo, saleWeapon, speak, startTutorial, simShot, get TUT() { return S.tutorial; }, STORY, talkNext, talkEnd, playChapter, openStory,
+  carveAt(x, y, r) { carve(x, y, r); }, setLang, tr, get LANG() { return LANG; }, openHowto, openShop, buyAmmo, buyPack, PACKS, offerAmmo, saleWeapon, speak, startTutorial, simShot, get TUT() { return S.tutorial; }, STORY, talkNext, talkEnd, playChapter, openStory,
 };
 
 // ---------------------------------------------------------------- 起動
@@ -3312,6 +3584,7 @@ loadProfile();
 if (matchMedia('(pointer:coarse)').matches) document.body.classList.add('touch');
 window.addEventListener('resize', resize);
 resize();
+setLang(LANG);
 buildTitle();
 goTitle();
 requestAnimationFrame(frame);

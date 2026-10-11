@@ -310,6 +310,37 @@ body.touch .stick{display:grid}
 .frwrap{width:min(520px,100%);padding:16px;display:flex;flex-direction:column;gap:12px}
 .frwrap h2.sub{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;font-family:var(--body)}
 .shopb .sl{display:inline-flex;align-items:center;gap:6px}
+#howto{display:flex;justify-content:center;background:rgba(10,14,18,.86);z-index:5}
+.hwrap{width:min(640px,100%);padding:16px;display:flex;flex-direction:column;gap:10px;align-self:flex-start}
+#howtoTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--plate2);border-radius:12px;padding:4px}
+#howtoTabs button{height:40px;border-radius:9px;font-weight:800}
+#howtoTabs button.sel{background:var(--paper);color:var(--ink)}
+#howtoList{display:flex;flex-direction:column;gap:6px}
+.hrow{display:grid;grid-template-columns:40px minmax(110px,auto) 1fr;gap:12px;align-items:center;background:var(--plate2);border-radius:10px;padding:8px 12px}
+.hrow .hic{width:40px;height:40px;border-radius:9px;background:rgba(0,0,0,.25);display:grid;place-items:center;color:var(--hazard)}
+.hrow .hic svg{width:26px;height:26px}
+.hrow b{font-size:14px;color:var(--hazard)}
+.hrow .hd{font-size:13px;font-weight:800;line-height:1.5}
+#howtoRules{list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--muted);padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04)}
+#howtoRules li::before{content:'';display:inline-block;width:6px;height:6px;border-radius:2px;background:var(--hazard);margin-right:8px;vertical-align:middle}
+#langSw{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--plate2);border-radius:12px;padding:4px;flex:1}
+#langSw button{border-radius:9px;font-weight:800;font-size:13px}
+#langSw button.sel{background:var(--paper);color:var(--ink)}
+#guide{position:fixed;width:0;height:0;pointer-events:none;z-index:4}
+#guide svg{position:absolute;width:44px;height:44px;left:-8px;top:-4px;filter:drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+#guide .ring{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;border:3px solid var(--hazard);opacity:0}
+#guide.g-right svg{animation:gR 1.4s ease-in-out infinite}
+#guide.g-up svg{animation:gU 1.4s ease-in-out infinite}
+#guide.g-upright svg{animation:gUR 1.6s ease-in-out infinite}
+#guide.g-tap svg{animation:gT 1s ease-in-out infinite}
+#guide.g-tap .ring{animation:gRing 1s ease-out infinite}
+@keyframes gR{0%,15%{transform:translate(0,0)}55%,75%{transform:translate(46px,0)}100%{transform:translate(0,0)}}
+@keyframes gU{0%,15%{transform:translate(0,0)}55%,75%{transform:translate(0,-46px)}100%{transform:translate(0,0)}}
+@keyframes gUR{0%,10%{transform:translate(0,0)}55%,70%{transform:translate(42px,-38px)}72%{opacity:1}85%{transform:translate(42px,-38px);opacity:0}100%{opacity:0}}
+@keyframes gT{0%,100%{transform:translate(0,0) scale(1)}45%{transform:translate(0,4px) scale(.92)}}
+@keyframes gRing{0%{opacity:.9;transform:scale(.5)}100%{opacity:0;transform:scale(1.3)}}
+body.touch .wbtn kbd{display:none}
+body.en .wbtn{font-size:9px;line-height:1.1;text-align:center}
 #pause{display:grid;place-items:center;background:rgba(17,24,29,.6)}
 #pause .plate{padding:22px;display:flex;flex-direction:column;gap:10px;width:260px}
 #pause h2{font-family:var(--display);font-weight:400;font-size:26px;text-align:center}
@@ -382,6 +413,7 @@ body.touch .stick{display:grid}
   <div id="hint" hidden></div>
   <div id="coach" hidden><canvas id="coachFace"></canvas><div><b>ドック <span id="coachStep"></span></b><p id="coachText"></p></div></div>
   <div id="banner" hidden></div>
+  <div id="guide" hidden><svg viewBox="0 0 32 32"><path d="M12 30c-2 0-4-1-5-3l-4-7c-.6-1 .2-2.4 1.4-2.4.6 0 1.1.3 1.5.8L8 21V6.5C8 5.1 9.1 4 10.5 4S13 5.1 13 6.5V14l7.6 1.6c1.5.3 2.5 1.7 2.3 3.2L22 26c-.3 2.3-2.3 4-4.6 4z" fill="#F4EFE3" stroke="#11181D" stroke-width="1.6" stroke-linejoin="round"/></svg><i class="ring"></i></div>
   <div class="stick" id="stickL"><i></i></div>
   <div class="stick" id="stickR"><i></i></div>
   <div id="tray" hidden></div>
@@ -418,6 +450,7 @@ body.touch .stick{display:grid}
     <button class="btn main story" id="bStory">ストーリー</button>
     <div class="row"><button class="btn" id="bStart">フリー対戦</button><button class="btn" id="bGarage"><span data-ico="wrench"></span>ガレージ</button></div>
     <button class="btn shopb" id="bShop"><span class="sl"><span data-ico="gear"></span>ショップ</span><small>セール 残り <span id="tSale">--:--:--</span></small></button>
+    <div class="row"><button class="btn" id="bHowto">遊び方</button><div id="langSw"><button data-l="ja">日本語</button><button data-l="en">EN</button></div></div>
     <p class="keys">4体で4分のデスマッチ。順番に1体ずつ動き、撃ったら5秒で逃げる。<br>当てたダメージと撃破でポイント。地面を崩して水に落とすのが一番早い。</p>
   </div>
 </section>
@@ -438,6 +471,15 @@ body.touch .stick{display:grid}
     <div class="ghead"><h2>ストーリー</h2><button class="btn" id="bStoryBack" style="height:40px;padding:0 14px">戻る</button></div>
     <p class="lead">スクラップ島の砲撃大会。優勝すれば新品の体がもらえる。</p>
     <div id="storyList"></div>
+  </div>
+</section>
+
+<section id="howto" class="scr" hidden>
+  <div class="hwrap plate">
+    <div class="ghead"><h2>遊び方</h2><button class="btn" id="bHowtoBack" style="height:40px;padding:0 14px">戻る</button></div>
+    <div id="howtoTabs"><button data-t="pc">PC</button><button data-t="sp">スマホ</button></div>
+    <div id="howtoList"></div>
+    <ul id="howtoRules"></ul>
   </div>
 </section>
 
@@ -484,6 +526,7 @@ body.touch .stick{display:grid}
   <div class="plate">
     <h2>一時停止</h2>
     <button class="btn main" id="bResume">再開</button>
+    <button class="btn" id="bPauseHowto">遊び方</button>
     <button class="btn" id="bQuit">タイトルへ</button>
   </div>
 </section>
@@ -503,6 +546,6 @@ body.touch .stick{display:grid}
   <p>横向きにしてください</p>
 </div>
 <div id="err" hidden></div>
-<script src="game.js?v=202610110719"></script>
+<script src="game.js?v=202610110732"></script>
 </body>
 </html>

@@ -571,6 +571,49 @@ await t('ショップ: 試合中に弾が切れると、試合を止めずに購
   })
   expect(r.shown && r.ammo === 8 && r.phase === 'retreat', JSON.stringify(r)); return r
 })
+await t('英語: 切り替えるとタイトル・武器・会話・結果が英語になり、戻すと日本語', async () => {
+  const r = await p.evaluate(() => {
+    bb.pause(true); bb.goTitle(); bb.resetProfile(); bb.setLang('en'); bb.goTitle()
+    const title = [document.querySelector('#bStory').innerText, document.querySelector('#bStart').innerText, document.querySelector('#bGarage').innerText, document.documentElement.lang]
+    bb.start({ seed: 9, skipLobby: true }); bb.toTurn(0)
+    const tray = [...document.querySelectorAll('#tray .wbtn span')].slice(0, 3).map(e => e.textContent)
+    const card = document.querySelector('#cards .nm').textContent
+    bb.goTitle(); bb.playChapter(0); bb.talkNext()
+    const talk = document.querySelector('#talkText').textContent
+    bb.talkEnd(); bb.S.bots[0].score = 900; bb.S.bots[0].kills = 1; bb.S.phase = 'turn'; bb.finish(); bb.run(100); bb.talkEnd()
+    const res = document.querySelector('#resHead').textContent + ' / ' + document.querySelector('#resSide dl').innerText.split('\n')[0]
+    // 日本語が残っていないか（画面に出ている文字）
+    const jp = /[\u3040-\u30ff\u4e00-\u9fff]/
+    const leftover = [...document.querySelectorAll('#result *')].filter(e => e.children.length === 0 && jp.test(e.textContent) && e.offsetParent).map(e => e.textContent).slice(0, 5)
+    bb.goTitle(); bb.setLang('ja'); bb.goTitle()
+    const back = document.querySelector('#bStart').innerText
+    return { title, tray, card, talk, res, leftover, back }
+  })
+  expect(r.title[1] === 'Free Battle' && r.title[3] === 'en' && r.tray[0] === 'Rocket' && r.card === 'You' && /Scrap Island/.test(r.talk) && /Goal cleared/.test(r.res) && !r.leftover.length && r.back === 'フリー対戦', JSON.stringify(r)); return r
+})
+await t('遊び方: タイトルと一時停止から開け、PC/スマホで中身が変わる', async () => {
+  const r = await p.evaluate(() => {
+    bb.pause(true); bb.goTitle(); document.querySelector('#bHowto').click()
+    const vis = !document.querySelector('#howto').hidden
+    document.querySelector('#howtoTabs [data-t="pc"]').click(); const pc = document.querySelector('#howtoList b').textContent
+    document.querySelector('#howtoTabs [data-t="sp"]').click(); const sp = document.querySelector('#howtoList b').textContent
+    document.querySelector('#bHowtoBack').click(); const backTitle = !document.querySelector('#title').hidden
+    return { vis, pc, sp, backTitle }
+  })
+  expect(r.vis && r.pc === 'A / D' && r.sp === '左スティック' && r.backTitle, JSON.stringify(r)); return r
+})
+await t('スマホのチュートリアル: 今やる操作の上に指ガイドが出る', async () => {
+  const q = await browser.newContext({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true })
+  const pg = await q.newPage(); await pg.goto('http://localhost:5282/'); await pg.waitForFunction(() => window.__bbReady)
+  const r = await pg.evaluate(async () => {
+    bb.start({ stage: 'practice', seed: 4242, tutorial: true, skipTalk: true })
+    await new Promise(r => setTimeout(r, 300))
+    const g = document.querySelector('#guide'), L = document.querySelector('#stickL').getBoundingClientRect()
+    return { shown: !g.hidden, anim: g.className, onStick: Math.abs(parseFloat(g.style.left) - (L.left + L.width / 2)) < 2, text: document.querySelector('#coachText').textContent }
+  })
+  await q.close()
+  expect(r.shown && r.anim === 'g-right' && r.onStick && /左スティック/.test(r.text), JSON.stringify(r)); return r
+})
 // ---------- 速度（端末のリフレッシュレートに依存しない）
 await t('ゲーム内時間が実時間どおり進む（1秒あたり約60ステップ）', async () => {
   const r = await p.evaluate(async () => {

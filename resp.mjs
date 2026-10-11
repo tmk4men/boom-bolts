@@ -7,7 +7,7 @@ const server = spawn(process.execPath, ['server.mjs'], { cwd: ROOT, env: { ...pr
 await new Promise(r => setTimeout(r, 400))
 const b = useWebkit ? await webkit.launch() : await chromium.launch()
 const SIZES = [[667, 375, true], [844, 390, true], [1024, 768, true], [1280, 720, false], [1920, 1080, false], [2560, 1440, false]]
-const SCREENS = ['title', 'free', 'story', 'shop', 'garage', 'match', 'result', 'talk']
+const SCREENS = ['title', 'free', 'story', 'shop', 'garage', 'match', 'result', 'talk', 'howto']
 mkdirSync(`${ROOT}/検証/resp`, { recursive: true })
 const issues = []
 for (const [w, h, touch] of SIZES) {
@@ -15,12 +15,13 @@ for (const [w, h, touch] of SIZES) {
   const p = await ctx.newPage(); const errs = []
   p.on('pageerror', e => errs.push(e.message))
   await p.goto('http://localhost:5285/'); await p.waitForFunction(() => window.__bbReady)
-  await p.evaluate(() => { bb.resetProfile(); bb.setProfile({ lv: 6, rivets: 3000, gears: 8, tut: true, story: 2 }) })
+  await p.evaluate(en => { bb.resetProfile(); bb.setProfile({ lv: 6, rivets: 3000, gears: 8, tut: true, story: 2 }); if (en) bb.setLang('en') }, process.argv.includes('en'))
   for (const sc of SCREENS) {
     await p.evaluate(sc => {
       bb.pause(true); bb.goTitle()
       if (sc === 'story') bb.openStory()
       if (sc === 'free') document.querySelector('#bStart').click()
+      if (sc === 'howto') bb.openHowto('title')
       if (sc === 'shop') bb.openShop()
       if (sc === 'garage') bb.openGarage()
       if (sc === 'match' || sc === 'result') { bb.start({ seed: 5, skipLobby: true }); bb.toTurn(0); bb.run(10) }
