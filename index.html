@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#18232B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
 <script>
 // 起動に失敗したときに原因を画面に出す（モジュールが読めない端末でも動く素の script）
 (function () {
@@ -397,6 +397,197 @@ body.en .wbtn{font-size:9px;line-height:1.1;text-align:center}
   #banner.show,#toast.show{animation-duration:.01s}
 }
 </style>
+<style id="skin">
+/* ================================================================
+   見た目の層: ブラウン管 × サビ鉄
+   捨てられた機械の島。枠はリベット留めの鉄板、情報はブラウン管の画面に出す
+   ================================================================ */
+:root{
+  --dot:'DotGothic16','M PLUS Rounded 1c',monospace;
+  --amber:#FFC46B;--phos:#9DFFC2;--crt:#08100C;
+  --steel-a:#3A4249;--steel-b:#262C31;--steel-c:#1A1F23;--edge:#0C0F11;
+  --rivet:radial-gradient(circle at 10px 10px,#A9B1B7 0 1.5px,#4A5259 2.1px,rgba(0,0,0,.6) 2.8px,transparent 3.4px),
+          radial-gradient(circle at calc(100% - 10px) 10px,#A9B1B7 0 1.5px,#4A5259 2.1px,rgba(0,0,0,.6) 2.8px,transparent 3.4px),
+          radial-gradient(circle at 10px calc(100% - 10px),#A9B1B7 0 1.5px,#4A5259 2.1px,rgba(0,0,0,.6) 2.8px,transparent 3.4px),
+          radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),#A9B1B7 0 1.5px,#4A5259 2.1px,rgba(0,0,0,.6) 2.8px,transparent 3.4px);
+  --rust:radial-gradient(ellipse 55% 35% at 88% 100%,rgba(150,72,32,.38),transparent 70%),
+         radial-gradient(ellipse 28% 22% at 6% 0%,rgba(150,72,32,.3),transparent 70%),
+         radial-gradient(ellipse 18% 30% at 100% 30%,rgba(120,60,28,.22),transparent 70%);
+  --brush:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px);
+  --steel:linear-gradient(180deg,var(--steel-a),var(--steel-b) 55%,var(--steel-c));
+  --scan:repeating-linear-gradient(0deg,rgba(0,0,0,.32) 0 1px,transparent 1px 3px);
+}
+
+/* --- 鉄板 --- */
+.plate{
+  background:var(--rivet),var(--rust),var(--brush),var(--steel);
+  border:2px solid var(--edge);border-radius:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 -2px 0 rgba(0,0,0,.45),0 8px 0 rgba(0,0,0,.4),0 20px 40px rgba(0,0,0,.45);
+}
+.plate h2,.ghead h2,#lobby h2,#pause h2{font-family:var(--display);font-weight:400;color:var(--amber);letter-spacing:.06em;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+
+/* --- ボタン（工場の押しボタン） --- */
+.btn{
+  background:linear-gradient(180deg,#48515A,#2E353B 60%,#262C31);border:2px solid var(--edge);border-radius:9px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.35),0 4px 0 #090B0D;color:#E9E4D8;
+  text-shadow:0 1px 0 rgba(0,0,0,.6);transition:transform .06s,box-shadow .06s,filter .15s;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 1px 0 #090B0D}
+.btn.main{
+  background:repeating-linear-gradient(-45deg,#1B1508 0 6px,transparent 6px 12px) left/14px 100% no-repeat,
+             repeating-linear-gradient(-45deg,#1B1508 0 6px,transparent 6px 12px) right/14px 100% no-repeat,
+             linear-gradient(180deg,#FFDB5C,#F4BA22 55%,#D9971A);
+  color:#1B1508;border:2px solid #1B1508;box-shadow:inset 0 2px 0 rgba(255,255,255,.55),inset 0 -3px 0 rgba(0,0,0,.18),0 5px 0 #6A4A0C;text-shadow:none;padding:0 26px;
+}
+.btn.main:active{transform:translateY(4px);box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 1px 0 #6A4A0C}
+.rb{background:linear-gradient(180deg,#3E464D,#23292E);border:2px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 #090B0D;color:#DCD6C8}
+
+/* --- 切り替えスイッチ（タブ） --- */
+#gTabs,#shopTabs,#howtoTabs,#diff,#langSw{background:#0F1316;border:2px solid var(--edge);box-shadow:inset 0 2px 6px rgba(0,0,0,.7);border-radius:10px}
+#gTabs button,#shopTabs button,#howtoTabs button,#diff button,#langSw button{color:#8F9AA2;position:relative}
+#gTabs button.sel,#shopTabs button.sel,#howtoTabs button.sel,#diff button.sel,#langSw button.sel{
+  background:linear-gradient(180deg,#4A535B,#30373D);color:var(--amber);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 0 #090B0D;text-shadow:0 0 8px rgba(255,180,80,.55)}
+#gTabs button.sel::after,#shopTabs button.sel::after,#howtoTabs button.sel::after,#diff button.sel::after{content:'';position:absolute;left:50%;bottom:5px;width:14px;height:3px;margin-left:-7px;border-radius:2px;background:var(--amber);box-shadow:0 0 8px var(--amber)}
+
+/* --- ブラウン管の画面 --- */
+.tbox,#resSide,#lobbyPlayers,.tvscr{position:relative}
+.tbox,#coach{
+  background:radial-gradient(ellipse at 50% 30%,#163024,var(--crt) 78%);
+  border:3px solid #0B0E10;border-radius:16px/20px;
+  box-shadow:inset 0 0 0 2px #2B3238,inset 0 0 30px rgba(140,255,190,.10),inset 0 0 70px rgba(0,0,0,.65),0 0 0 6px #262C31,0 0 0 8px var(--edge),0 12px 30px rgba(0,0,0,.55);
+}
+.tbox::after,#coach::after,#resSide::after,.tvscr::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:var(--scan);mix-blend-mode:multiply;opacity:.8}
+#talk.right .tbox,#talk:not(.right) .tbox{border-left-width:3px;border-right-width:3px}
+.tbox{border-left:3px solid #0B0E10!important;border-right:3px solid #0B0E10!important}
+#talkName{font-family:var(--dot);font-size:15px;letter-spacing:.06em;color:var(--c);text-shadow:0 0 8px var(--c)}
+#talkText{font-family:var(--dot);font-weight:400;font-size:17px;line-height:1.75;color:#DFFFEA;text-shadow:0 0 6px rgba(140,255,190,.45)}
+#talk.narr #talkText{color:var(--amber);text-shadow:0 0 8px rgba(255,180,80,.5)}
+#talkFace{background:radial-gradient(circle at 50% 60%,rgba(140,255,190,.10),transparent 70%)}
+.tnext{color:var(--phos)}
+#coach{border-left:3px solid #0B0E10!important}
+#coach b{font-family:var(--dot);color:var(--amber);text-shadow:0 0 8px rgba(255,180,80,.5)}
+#coach p{font-family:var(--dot);font-weight:400;color:#DFFFEA;text-shadow:0 0 6px rgba(140,255,190,.4)}
+#coach.ok{box-shadow:inset 0 0 0 2px var(--amber),inset 0 0 40px rgba(255,190,80,.2),0 0 0 6px #262C31,0 0 0 8px var(--edge)}
+#coach.ok p{font-family:var(--dot);color:var(--amber)}
+#talkSkip{font-family:var(--dot)}
+
+/* --- 結果の読み出し --- */
+#resSide{background:radial-gradient(ellipse at 50% 30%,#152A20,var(--crt) 80%);border:3px solid #0B0E10;border-radius:12px/16px;padding:12px 14px;box-shadow:inset 0 0 0 2px #2B3238,inset 0 0 40px rgba(0,0,0,.6)}
+#resSide dl,#resSide .next,#resSide .lvbar{font-family:var(--dot);font-weight:400}
+#resSide dt{color:#8FD9AE}
+#resSide dd{font-family:var(--dot);color:#DFFFEA;text-shadow:0 0 6px rgba(140,255,190,.45)}
+#resSide .lvbar span{font-family:var(--dot);color:var(--amber)}
+#resSide .lvbar>i{background:#0F1A14;box-shadow:inset 0 0 0 1px #24402F}
+#resSide .lvbar>i i{background:repeating-linear-gradient(90deg,var(--phos) 0 6px,transparent 6px 8px);box-shadow:0 0 8px rgba(140,255,190,.6)}
+#resSide .stars span.on{filter:drop-shadow(0 0 8px rgba(255,200,80,.7))}
+#resHead{font-family:var(--display);letter-spacing:.04em;color:var(--amber);-webkit-text-stroke:3px #12100A;text-shadow:0 5px 0 #12100A,0 0 30px rgba(255,180,80,.35)}
+.pc .col{background:var(--rivet),var(--brush),var(--steel);border-top-width:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 0 rgba(0,0,0,.4)}
+.pc .col b{font-family:var(--dot);color:var(--amber);text-shadow:0 0 10px rgba(255,180,80,.5)}
+.pts{background:var(--crt);color:#DFFFEA;border:2px solid #2B3238;box-shadow:0 0 0 2px var(--edge)}
+.pts b{font-family:var(--dot);text-shadow:0 0 6px rgba(140,255,190,.5)}
+.pts small{color:#8FD9AE}
+
+/* --- 試合中の表示 --- */
+.card{background:var(--brush),linear-gradient(180deg,#363E44,#20262A);border:2px solid var(--edge);border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 0 rgba(0,0,0,.5)}
+.card canvas{background:radial-gradient(circle at 50% 55%,#173024,var(--crt) 80%);border:1px solid #0B0E10;box-shadow:inset 0 0 6px rgba(140,255,190,.25)}
+.card .sc{font-family:var(--dot);color:#DFFFEA;text-shadow:0 0 6px rgba(140,255,190,.45);font-size:14px}
+.card .nm{color:#9AA6AE}
+.card.on{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 0 14px color-mix(in srgb,var(--c) 55%,transparent),0 3px 0 rgba(0,0,0,.5)}
+.card .kb{font-family:var(--dot)}
+#timer{border-radius:50%;background:radial-gradient(circle at 50% 45%,#2A3036,#14181B 70%);box-shadow:0 0 0 3px #3A4249,0 0 0 5px var(--edge),0 4px 0 5px rgba(0,0,0,.45)}
+#timer b{font-family:var(--dot);color:var(--amber);text-shadow:0 0 10px rgba(255,180,80,.6)}
+#timer small{font-family:var(--dot);color:#8FD9AE}
+#timer.hot b{color:#FF6A5C;text-shadow:0 0 12px rgba(255,90,70,.8)}
+#wslot,#boost{background:var(--brush),linear-gradient(180deg,#434B52,#262C31);border:2px solid var(--edge);border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 0 #090B0D}
+#wslot span,#boost{font-family:var(--body)}
+#wslot em,#boost em{font-family:var(--dot)}
+#mini{border:3px solid #0B0E10;border-radius:10px/12px;box-shadow:0 0 0 3px #30373D,0 0 0 5px var(--edge),inset 0 0 20px rgba(0,0,0,.6)}
+#tray{background:var(--rivet),var(--brush),var(--steel);border:2px solid var(--edge);box-shadow:0 8px 0 rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12)}
+.wbtn{background:linear-gradient(180deg,#2C3338,#1E2327);border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.wbtn.sel{background:linear-gradient(180deg,#FFDB5C,#E8A91C);box-shadow:0 0 12px rgba(255,190,60,.45)}
+.wbtn em{font-family:var(--dot)}
+#banner{background:linear-gradient(90deg,transparent,rgba(12,15,17,.92) 12%,rgba(12,15,17,.92) 88%,transparent);border:0;padding:.2em 1em}
+#banner::before,#banner::after{content:'';position:absolute;left:8%;right:8%;height:6px;background:repeating-linear-gradient(-45deg,var(--hazard) 0 9px,#14100A 9px 18px)}
+#banner::before{top:-6px}#banner::after{bottom:-6px}
+#hint{background:rgba(10,14,12,.86);border:2px solid #24402F;font-family:var(--body)}
+#offer{background:var(--brush),var(--steel);border:2px solid var(--hazard)}
+
+/* --- 一覧（ストーリー・ショップ・ガレージ・遊び方） --- */
+.chap,.item,.part,.hrow,.lp,.stage{
+  background:radial-gradient(circle at 8px 50%,#8A9299 0 1.3px,#3A4248 1.9px,transparent 2.6px),radial-gradient(circle at calc(100% - 8px) 50%,#8A9299 0 1.3px,#3A4248 1.9px,transparent 2.6px),var(--brush),linear-gradient(180deg,#2E353B,#21272B);
+  border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 0 rgba(0,0,0,.4)}
+.chap b{font-family:var(--dot);color:var(--amber)}
+.chap.cleared em{color:var(--phos);text-shadow:0 0 8px rgba(140,255,190,.5)}
+.part.eq{border-color:var(--you);box-shadow:0 0 0 1px var(--you),0 0 16px rgba(255,122,26,.25)}
+.part canvas,.item .wico{background:radial-gradient(circle at 50% 60%,#173024,var(--crt) 80%);border:1px solid #0B0E10}
+.pips i.on{box-shadow:0 0 6px var(--hazard)}
+.item .buy,.pa button{border:2px solid #1B1508;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 0 #6A4A0C}
+.item .buy:disabled,.pa button.ghost,.pa button:disabled{border-color:var(--edge);box-shadow:none}
+.saleb{border:2px solid #1B1508;font-family:var(--dot);font-weight:400;font-size:13px}
+.saleb b{font-family:var(--dot)}
+.prof .cur{font-family:var(--dot)}
+.st b{font-family:var(--dot);color:#DFFFEA}
+.st i{background:#0F1316;box-shadow:inset 0 0 0 1px #2B3238}
+.st i i{background:repeating-linear-gradient(90deg,var(--you) 0 5px,transparent 5px 7px);box-shadow:0 0 6px rgba(255,122,26,.6)}
+#gBot{background:radial-gradient(ellipse 50% 30% at 50% 92%,rgba(255,200,120,.18),transparent 70%),repeating-linear-gradient(-45deg,rgba(255,197,49,.10) 0 10px,transparent 10px 20px) bottom/100% 14px no-repeat,radial-gradient(circle at 50% 60%,#26303A,transparent 70%)}
+#lobbyCount{font-family:var(--dot);color:var(--amber);text-shadow:0 0 16px rgba(255,180,80,.7)}
+.lp span{font-family:var(--body)}
+.linfo b{font-family:var(--dot);color:#DFFFEA}
+
+/* --- タイトル: 看板とテレビ --- */
+.signb{position:relative;padding:22px 26px 18px;border-radius:8px;
+  background:radial-gradient(circle at 12px 12px,#B5BBC0 0 2px,#4A5259 2.8px,transparent 3.6px),radial-gradient(circle at calc(100% - 12px) 12px,#B5BBC0 0 2px,#4A5259 2.8px,transparent 3.6px),
+             radial-gradient(circle at 12px calc(100% - 12px),#B5BBC0 0 2px,#4A5259 2.8px,transparent 3.6px),radial-gradient(circle at calc(100% - 12px) calc(100% - 12px),#B5BBC0 0 2px,#4A5259 2.8px,transparent 3.6px),
+             radial-gradient(ellipse 40% 60% at 95% 100%,rgba(160,74,30,.55),transparent 70%),radial-gradient(ellipse 30% 40% at 0% 0%,rgba(160,74,30,.45),transparent 70%),
+             var(--brush),linear-gradient(170deg,#3C3A36,#272A2C 50%,#1E2124);
+  border:3px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 10px 0 rgba(0,0,0,.45),0 24px 50px rgba(0,0,0,.5);transform:rotate(-2deg)}
+.signb .chain{position:absolute;top:-60px;width:4px;height:62px;background:repeating-linear-gradient(180deg,#6B7379 0 6px,#2A2F33 6px 8px);border-radius:2px}
+.signb .chain.l{left:40px}.signb .chain.r{right:40px}
+.signb h1{text-shadow:0 5px 0 #0A0C0E,0 0 40px rgba(255,190,70,.25)}
+.signb p{display:inline-block;margin-top:8px;font-family:var(--dot);font-weight:400;color:var(--amber);background:#0B0F0D;border:2px solid #2B3238;text-shadow:0 0 8px rgba(255,180,80,.6)}
+.logo .tape{display:none}
+.panel.tv{display:flex;flex-direction:row;gap:12px;padding:14px;border-radius:22px;
+  background:var(--brush),radial-gradient(ellipse 40% 30% at 90% 100%,rgba(150,72,32,.35),transparent 70%),linear-gradient(180deg,#3A3530,#2A2622 60%,#1F1C19);
+  border:3px solid var(--edge);box-shadow:inset 0 2px 0 rgba(255,255,255,.12),inset 0 -3px 0 rgba(0,0,0,.5),0 10px 0 rgba(0,0,0,.45),0 30px 60px rgba(0,0,0,.55);width:min(480px,100%)}
+.tvscr{flex:1;display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:20px/26px;
+  background:radial-gradient(ellipse at 50% 35%,#16291F,var(--crt) 80%);border:3px solid #0B0E10;
+  box-shadow:inset 0 0 0 3px #2B3238,inset 0 0 40px rgba(140,255,190,.08),inset 0 0 90px rgba(0,0,0,.7)}
+.tvscr .btn[data-ch]{position:relative}
+.tvscr .btn[data-ch]::before{content:attr(data-ch);position:absolute;left:10px;top:6px;font-family:var(--dot);font-size:10px;font-weight:400;letter-spacing:.06em;opacity:.7}
+.tvscr .btn.main[data-ch]::before{left:22px}
+.tvscr .keys{font-family:var(--dot);font-weight:400;color:#8FD9AE;text-shadow:0 0 6px rgba(140,255,190,.35)}
+.tvside{width:44px;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:18px}
+.tvside .knob{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#9AA2A9,#4A5259 55%,#22272B);border:2px solid var(--edge);box-shadow:0 3px 0 rgba(0,0,0,.5);position:relative}
+.tvside .knob::after{content:'';position:absolute;left:50%;top:4px;width:3px;height:11px;margin-left:-1.5px;background:#1A1F23;border-radius:2px}
+.tvside .knob:nth-child(2){transform:rotate(70deg)}
+.tvside .grill{flex:1;width:26px;margin-bottom:18px;border-radius:6px;background:repeating-linear-gradient(0deg,#151819 0 3px,#3A3530 3px 6px);box-shadow:inset 0 0 0 2px var(--edge)}
+
+/* --- 画面切り替え: ブラウン管の電源が入る --- */
+.scr.crton>*{animation:crtOn .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes crtOn{0%{transform:scale(1.05,.006);filter:brightness(4) saturate(0);opacity:.2}45%{transform:scale(1,.04);filter:brightness(2.4)}70%{transform:scale(1,1.02);filter:brightness(1.3)}100%{transform:none;filter:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.scr.crton>*{animation:none}}
+
+@media (max-height:520px){
+  .rright{gap:8px;padding:10px}
+  #resSide{padding:8px 12px}
+  #resSide .stars span{font-size:26px}
+  #resSide dl{gap:2px 10px;font-size:13px}
+  .rbtns{gap:6px}
+  .rbtns .btn{height:40px}
+  .rbtns .btn.main{height:44px}
+  #resHead{font-size:34px}
+}
+/* 狭い画面: テレビの横つまみを省いて中身に幅を渡す */
+@media (max-width:760px),(max-height:520px){
+  .tvside{display:none}
+  .panel.tv{padding:10px;border-radius:16px}
+  .tvscr{padding:12px;gap:10px}
+  .signb{padding:14px 18px 12px;transform:rotate(-1.5deg)}
+  .signb .chain{display:none}
+}
+
+</style>
 </head>
 <body>
 <canvas id="cv"></canvas>
@@ -440,19 +631,18 @@ body.en .wbtn{font-size:9px;line-height:1.1;text-align:center}
 <section id="title" class="scr">
   <button class="rb" id="tMute" aria-label="音" style="position:fixed;right:calc(10px + var(--sr));bottom:calc(10px + var(--sb));background:rgba(17,24,29,.78);z-index:2"></button>
   <div class="logo">
-    <h1>BOOM<span>BOLTS</span></h1>
-    <p>ブリキロボの砲撃戦</p>
+    <div class="signb"><i class="chain l"></i><i class="chain r"></i><h1>BOOM<span>BOLTS</span></h1><p>ブリキロボの砲撃戦</p></div>
     <div class="tape"></div>
     <canvas id="tBot"></canvas>
     <div class="prof"><span id="tLv">Lv 1</span><span class="xpb"><i id="tXp"></i></span><span class="cur"><span data-ico="rivet"></span><span id="tRiv">0</span></span><span class="cur"><span data-ico="gear"></span><span id="tGear">0</span></span></div>
   </div>
-  <div class="panel plate">
-    <button class="btn main story" id="bStory">ストーリー</button>
-    <div class="row"><button class="btn" id="bStart">フリー対戦</button><button class="btn" id="bGarage"><span data-ico="wrench"></span>ガレージ</button></div>
-    <button class="btn shopb" id="bShop"><span class="sl"><span data-ico="gear"></span>ショップ</span><small>セール 残り <span id="tSale">--:--:--</span></small></button>
-    <div class="row"><button class="btn" id="bHowto">遊び方</button><div id="langSw"><button data-l="ja">日本語</button><button data-l="en">EN</button></div></div>
+  <div class="panel plate tv"><div class="tvscr">
+    <button class="btn main story" id="bStory" data-ch="CH1">ストーリー</button>
+    <div class="row"><button class="btn" id="bStart" data-ch="CH2">フリー対戦</button><button class="btn" id="bGarage" data-ch="CH3"><span data-ico="wrench"></span>ガレージ</button></div>
+    <button class="btn shopb" id="bShop" data-ch="CH4"><span class="sl"><span data-ico="gear"></span>ショップ</span><small>セール 残り <span id="tSale">--:--:--</span></small></button>
+    <div class="row"><button class="btn" id="bHowto" data-ch="CH5">遊び方</button><div id="langSw"><button data-l="ja">日本語</button><button data-l="en">EN</button></div></div>
     <p class="keys">4体で4分のデスマッチ。順番に1体ずつ動き、撃ったら5秒で逃げる。<br>当てたダメージと撃破でポイント。地面を崩して水に落とすのが一番早い。</p>
-  </div>
+  </div><div class="tvside" aria-hidden="true"><i class="knob"></i><i class="knob"></i><i class="grill"></i></div></div>
 </section>
 
 <section id="free" class="scr" hidden>
@@ -546,6 +736,6 @@ body.en .wbtn{font-size:9px;line-height:1.1;text-align:center}
   <p>横向きにしてください</p>
 </div>
 <div id="err" hidden></div>
-<script src="game.js?v=202610110732"></script>
+<script src="game.js?v=202610110744"></script>
 </body>
 </html>

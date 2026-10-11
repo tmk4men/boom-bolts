@@ -14,7 +14,7 @@ async function t(name, fn) {
 const expect = (c, msg) => { if (!c) throw new Error(msg) }
 
 async function page(opts = {}) {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, ...opts })
+  const ctx = await browser.newContext({ locale: 'ja-JP', viewport: { width: 1280, height: 800 }, ...opts })
   const p = await ctx.newPage(); p.errs = []
   p.on('pageerror', e => p.errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') p.errs.push(m.text()) })
   if (opts.initScript) await p.addInitScript(opts.initScript)

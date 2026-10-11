@@ -3118,6 +3118,8 @@ function updateGuide() {
 // ---------------------------------------------------------------- 画面とHUD
 function showScreen(id) {
   for (const s of ['#title', '#garage', '#result', '#pause', '#story', '#shop', '#free', '#howto']) $(s).hidden = s !== id;
+  // ブラウン管の電源が入る演出
+  if (id) { const el = $(id); el.classList.remove('crton'); void el.offsetWidth; el.classList.add('crton'); }
   $('#offer').hidden = true;
 }
 function inMatch() { return ['lobby', 'banner', 'turn', 'retreat', 'settle', 'over'].includes(S.phase); }

@@ -10,7 +10,7 @@ const touch = process.argv.includes('touch'), en = process.argv.includes('en')
 const server = spawn(process.execPath, ['server.mjs'], { cwd: ROOT, env: { ...process.env, PORT: '5281' } })
 await new Promise(r => setTimeout(r, 400))
 const b = useWebkit ? await webkit.launch() : await chromium.launch()
-const ctx = await b.newContext({ viewport: { width: W, height: H }, ...(touch ? { isMobile: !useWebkit, hasTouch: true, deviceScaleFactor: 2 } : {}) })
+const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: W, height: H }, ...(touch ? { isMobile: !useWebkit, hasTouch: true, deviceScaleFactor: 2 } : {}) })
 const p = await ctx.newPage(); const errs = []
 p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()) }); p.on('requestfailed', r => errs.push('fail ' + r.url()))
 await p.goto('http://localhost:5281/'); await p.waitForFunction(() => window.__bbReady, null, { timeout: 20000 }); await p.waitForTimeout(800)

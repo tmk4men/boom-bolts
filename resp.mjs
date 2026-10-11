@@ -11,7 +11,7 @@ const SCREENS = ['title', 'free', 'story', 'shop', 'garage', 'match', 'result', 
 mkdirSync(`${ROOT}/検証/resp`, { recursive: true })
 const issues = []
 for (const [w, h, touch] of SIZES) {
-  const ctx = await b.newContext({ viewport: { width: w, height: h }, ...(touch ? { hasTouch: true, isMobile: !useWebkit, deviceScaleFactor: 2 } : {}) })
+  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: w, height: h }, ...(touch ? { hasTouch: true, isMobile: !useWebkit, deviceScaleFactor: 2 } : {}) })
   const p = await ctx.newPage(); const errs = []
   p.on('pageerror', e => errs.push(e.message))
   await p.goto('http://localhost:5285/'); await p.waitForFunction(() => window.__bbReady)
